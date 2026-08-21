@@ -1,0 +1,1202 @@
+[
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/actions/horoscope.py",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/actions/horoscope.py",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "deep",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 0.8
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/actions/ip_address.py",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "deep",
+      "deep"
+    ],
+    "mode": "shallow",
+    "agreement": 0.6
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/actions/ip_address.py",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep"
+    ],
+    "mode": "deep",
+    "agreement": 1.0
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/actions/tell_time.py",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/actions/tell_time.py",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/actions/imgur_handler.py",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/actions/imgur_handler.py",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep"
+    ],
+    "mode": "deep",
+    "agreement": 1.0
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/utilities/snowboydecoder.py",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/utilities/snowboydecoder.py",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep"
+    ],
+    "mode": "deep",
+    "agreement": 1.0
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/actions/spelling.py",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/actions/spelling.py",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "deep",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 0.8
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/actions/general_conversations.py",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/actions/general_conversations.py",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/actions_db.py",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/actions_db.py",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      null
+    ],
+    "mode": "deep",
+    "agreement": 0.8
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/actions/system_status.py",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/actions/system_status.py",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep"
+    ],
+    "mode": "deep",
+    "agreement": 1.0
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/actions/lighting.py",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "Melissa-Core",
+    "module": "melissa/actions/lighting.py",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/api/controller/Base.php",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/api/controller/Base.php",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep"
+    ],
+    "mode": "deep",
+    "agreement": 1.0
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/user/controller/Article.php",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/user/controller/Article.php",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/api/controller/UserRecharge.php",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/api/controller/UserRecharge.php",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/common/validate/UserMessage.php",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/common/validate/UserMessage.php",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/fladmin/controller/Index.php",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/fladmin/controller/Index.php",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/weixin/controller/WxPay.php",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/weixin/controller/WxPay.php",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep"
+    ],
+    "mode": "deep",
+    "agreement": 1.0
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/common/validate/Category.php",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "deep",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 0.8
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/common/validate/Category.php",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "deep",
+      "shallow",
+      "deep",
+      "deep",
+      "shallow"
+    ],
+    "mode": "deep",
+    "agreement": 0.6
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/common/model/Bonus.php",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/common/model/Bonus.php",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/common/validate/UserGoodsHistory.php",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/common/validate/UserGoodsHistory.php",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/fladmin/controller/Push.php",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "nbnbk",
+    "module": "application/fladmin/controller/Push.php",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "src/pages/404.tsx",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "src/pages/404.tsx",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "src/components/Exception/index.tsx",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "deep",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 0.8
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "src/components/Exception/index.tsx",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep"
+    ],
+    "mode": "deep",
+    "agreement": 1.0
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "src/pages/index.tsx",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "src/pages/index.tsx",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "src/pages/404.js",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "src/pages/404.js",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      null,
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 0.8
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "src/layouts/__tests__/index.test.tsx",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "src/layouts/__tests__/index.test.tsx",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "src/models/connect.d.ts",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "src/models/connect.d.ts",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "src/utils/debug.tsx",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "src/utils/debug.tsx",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep"
+    ],
+    "mode": "deep",
+    "agreement": 1.0
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "config/router.config.ts",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "config/router.config.ts",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      null,
+      "shallow",
+      "deep"
+    ],
+    "mode": "shallow",
+    "agreement": 0.6
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "src/utils/wx.tsx",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "src/utils/wx.tsx",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep"
+    ],
+    "mode": "deep",
+    "agreement": 1.0
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "src/utils/constants.tsx",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "umi-dva-antd-mobile",
+    "module": "src/utils/constants.tsx",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "keys.lua",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "keys.lua",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "djvureader.lua",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "deep",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 0.8
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "djvureader.lua",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      null,
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 0.8
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "fileinfo.lua",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "fileinfo.lua",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep"
+    ],
+    "mode": "deep",
+    "agreement": 1.0
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "filechooser.lua",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "filechooser.lua",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep"
+    ],
+    "mode": "deep",
+    "agreement": 1.0
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "koptreader.lua",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "koptreader.lua",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "deep",
+      null,
+      "deep",
+      "deep",
+      null
+    ],
+    "mode": "deep",
+    "agreement": 0.6
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "graphics.lua",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "deep",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 0.8
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "graphics.lua",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "unireader.lua",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "unireader.lua",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "mode": null,
+    "agreement": 0.0
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "filehistory.lua",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "deep",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 0.8
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "filehistory.lua",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep"
+    ],
+    "mode": "deep",
+    "agreement": 1.0
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "filesearcher.lua",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "filesearcher.lua",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep"
+    ],
+    "mode": "deep",
+    "agreement": 1.0
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "gettext.lua",
+    "model": "deepseek-v4-flash-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  },
+  {
+    "repo": "kindlepdfviewer",
+    "module": "gettext.lua",
+    "model": "glm-5.3-ioa",
+    "granularity": "file",
+    "labels": [
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow"
+    ],
+    "mode": "shallow",
+    "agreement": 1.0
+  }
+]
