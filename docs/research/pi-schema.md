@@ -306,6 +306,36 @@ pi --no-context-files --no-session --mode json -p "Reply with the single word: O
 
 ---
 
+### 8.1 真实合成任务冒烟（#28 补充实测）
+
+在试点仓库 nbnbk（ThinkPHP5，pin `532bfdc`）上跑一个真实「定位类」合成任务（对齐 #6 三类合成任务）：定位购物车列表 API 的实现位置（症状→位置）。同款模型 `tencent-copilot/deepseek-v4-flash-ioa`，`--mode rpc` + Python 客户端（保持 stdin 打开、轮询 stdout、等 `agent_settled` 再拉 stats）。事件流原始证据 `/tmp/pi-nbnbk/events.jsonl`（859 事件）。
+
+**运行概况（多轮工具调用任务）**：
+
+| 维度 | 实测值 | 与文档一致？ |
+|---|---|---|
+| turn 数 | 7（`turn_start` 计数） | ✅ 与 `assistantMessages` 一致 |
+| 工具调用 | 8 次（grep×2 / bash×5 / read×1） | ✅ `tool_execution_start/end` 成对 |
+| 工具结果 | 8 条 `toolResults` | ✅ |
+| 终局 | `agent_settled` 1 次 | ✅ |
+| tokens（会话级） | input 12862 / output 1027 / cacheRead 70784 / total 84673 | ✅ 全会话聚合 |
+| cost | 0 | ✅ 恒 0（同 #25） |
+| contextUsage | tokens 13468 / contextWindow 1000000 / percent 1.35 | ✅ |
+| 结局信号 | 无 `result.subtype`，靠 `agent_settled` + 验收测试 | ✅（#27 §5 预测） |
+| 最终回复 | `get_last_assistant_text` 返回定位结论 | ✅ agent 正确找到 `application/api/controller/Cart.php::index()` + `cart` 表 |
+
+**关键字段实测（真实任务，非样例）**：
+
+- `tool_execution_start`: `{"toolCallId":"call_...","toolName":"grep","args":{"pattern":"cart","glob":"**/*.php","ignoreCase":true,"limit":50}}`——**`args` 为对象**，含模型生成的完整参数。
+- `tool_execution_end`: `{"toolCallId":"...","toolName":"bash","result":{"content":[{"type":"text","text":"..."}]},"isError":false}`；grep 无输出时 `isError: true`——**失败标记可靠**。
+- `tool_execution_update` 出现 14 次（流式输出）。
+- 每条 `message_end`(assistant) 带 `usage`（含 `cacheRead` 增长 1024→13056 的缓存命中轨迹）。
+- `turn_end.message.stopReason`：`toolUse`（工具循环中）/ `stop`（最终）。
+
+**harness 采集要点（真实任务验证）**：轮次 = `turn_start` 计数（与 `assistantMessages` 一致，即模型调用次数——与 CodeBuddy `num_turns` 语义相同，#25 §TL;DR#5）；工具调用 = `tool_execution_start/end` 成对（`toolCallId` 关联）；失败 = `isError` 标志；结局 = `agent_settled`；wall_time = 事件时间戳差。
+
+---
+
 ## 9. 遗留 / 边界
 
 - **本机实测的意外（值得记录）**：a) 显式 `--provider tencent-copilot` 触发模型目录刷新时序 bug，偶发 `Unknown provider "tencent-copilot"`（stderr 提示用 `--list-models` 刷新）；不加 `--provider` 时偶发 `Warning: No models match pattern "..."`（后台刷新未完成），但最终模型解析成功。**harness 首次跑前应先 `pi --list-models` 预热目录**，并固定 settings 默认模型。b) `--no-*` 全禁组合（含 `--no-extensions`）下 `get_state` 返回 `model: unknown` 且 prompt 报 `No API key found`——疑似与模型目录刷新交互，最简参数正常；需在 harness 里验证该组合的稳定性。
@@ -314,3 +344,5 @@ pi --no-context-files --no-session --mode json -p "Reply with the single word: O
 - `cost` 非零场景（有计费映射的 API key）未验证，本机恒 0。
 - `--mode json` 与 `--mode rpc` 事件字段是否完全一致（json.md 的 `WithoutPartial` 类型变换）未做逐事件 diff。
 - 扩展 UI 子协议（`extension_ui_request`/`extension_ui_response`）未实测——harness 若加载交互式扩展需实现。
+- **#28 补充实测的踩坑**：a) 命令行 stdin 管道直接 `echo` 一次性关闭 stdin，prompt 受理后 agent 停在 user 消息（必须用 Python 客户端保持 stdin 打开 + 轮询，见 §8.1）；b) 在 cognicode 仓库 cwd 下 `--no-*` 全禁组合触发模型目录刷新 bug（`model: unknown` + `No API key`）——在 nbnbk 裸仓库下不带 `--no-*` 全禁组合（仅 `--no-session` + 显式 `-e` 加载 provider 扩展）即正常；c) `get_session_stats` 若在 `agent_settled` 前发会返回全 0（命令按序但统计未落定），必须等终局信号。
+- **本机扩展加载注意**：headless 子进程**不自动加载 settings 的 packages**（`pi-codebuddy-kit` 的 `tencent-copilot` provider 不注册），需显式 `-e /root/.pi/agent/git/github.com/asiazhang/pi-codebuddy-kit` 加载。这与 #27 §6「`--no-*` 禁发现但显式 `-e` 仍加载」一致，但 #27 未覆盖「settings packages 在 headless 下不加载」这一层。harness 必须固定 `-e` 参数或把 provider 写进 models 配置。
