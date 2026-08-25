@@ -13,7 +13,10 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
+import time
+from pathlib import Path
 
 from cognicode import __version__
 from cognicode.schema import REPORT_SCHEMA_VERSION
@@ -46,12 +49,36 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _cmd_scan(args: argparse.Namespace) -> int:
-    # pipeline 本体在后续票实现（harness/生成/静态提取）；这里先接壳。
+    """扫描仓库：当前先落地静态提取（#18），动态管线由后续票实现。"""
     mode = "offline" if args.offline else "full"
-    print(
-        f"[cognicode] scan 管线（{mode}）尚未实现："
-        f"对 {args.repo!r} 的评估由后续构建票落地"
+    repo_path = Path(args.repo)
+    if not repo_path.is_dir():
+        print(f"[cognicode] 错误：{args.repo!r} 不是目录", file=sys.stderr)
+        return 1
+
+    run_id = f"scan-{int(time.time())}"
+    run_dir = Path.cwd() / ".cognicode" / run_id
+    run_dir.mkdir(parents=True, exist_ok=True)
+
+    from cognicode.static_signals import static_json
+
+    data = static_json(repo_path)
+    static_file = run_dir / "static.json"
+    static_file.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    dims = data["dimensions"]
+    summary = "  ".join(
+        f"{d}={v['score']:.2f}" for d, v in sorted(dims.items())
     )
+    print(
+        f"[cognicode] scan（{mode}）已完成静态提取："
+        f"{repo_path} → {static_file}\n  {summary}"
+    )
+    if mode != "offline":
+        print(
+            f"[cognicode] 动态测量（harness/生成/判卷）尚未实现："
+            f"本次仅静态面（#18），后续票落地"
+        )
     return 0
 
 
