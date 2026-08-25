@@ -419,7 +419,8 @@ def _extract_comment_density(files: list[Path], root: Path) -> SignalResult:
         lang = _lang_for_file(rel)
         if lang is None:
             continue
-        src = (root / rel).read_bytes()
+        with open(root / rel, "rb") as f:
+            src = f.read()
         total_bytes += len(src)
         comment = _comment_bytes_for_file(rel, src, lang)
         if comment is None:

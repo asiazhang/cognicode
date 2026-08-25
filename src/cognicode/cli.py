@@ -93,41 +93,97 @@ def _cmd_scan(args: argparse.Namespace) -> int:
         f"\n  → {probe_file}"
     )
 
-    # ---- 演示任务（#19 验收：能独立跑通一次探测 + 单任务执行收 diff）----
-    # 任务生成管线归 #20；这里用固定探测 prompt 验证链路
+    # ---- 任务生成（#20）：探测成功才生成（Q17：探测全灭 → 整体降级）----
+    # 三段式：tree-sitter 解析 → LLM 模板合成（offline 走确定性模板）→
+    # 执行式验证过滤。判卷（F2P/P2P、位置匹配）归 #21。
     if probe["success"]:
+        from cognicode.pipeline import generate_task_suite
+
+        llm = None  # LLM 合成配置独立固定；offline 走确定性模板（Q17）
+        if mode != "offline":
+            # full 模式：生成走 llm 接口（配置独立固定），失败兜底确定性模板
+            from cognicode.llm import PiLlmClient
+
+            llm = PiLlmClient()
+
+        suite = generate_task_suite(repo_path, llm=llm)
+        tasks_file = run_dir / "tasks.json"
+        tasks_file.write_text(
+            json.dumps(
+                {
+                    "counts": {
+                        k: len(v) for k, v in suite.items() if k != "dropped"
+                    },
+                    "dropped": suite["dropped"],
+                    "tasks": [
+                        {
+                            "id": t.id,
+                            "kind": t.kind,
+                            "prompt": t.prompt,
+                            "ground_truth": t.ground_truth,
+                            "k": t.k,
+                            "injection": getattr(t, "injection", None),
+                            "bug": getattr(t, "bug", None),
+                            "acceptance_files": getattr(t, "acceptance_files", []),
+                            "guard_files": getattr(t, "guard_files", []),
+                        }
+                        for t in (
+                            suite["search"] + suite["locate"] + suite["modify"]
+                        )
+                    ],
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        print(
+            f"[cognicode] 任务生成（{mode}）："
+            f"检索 {len(suite['search'])} / 定位 {len(suite['locate'])} / "
+            f"修改 {len(suite['modify'])}；砍掉 {len(suite['dropped'])} 个"
+            f"\n  → {tasks_file}"
+        )
+
+        # ---- 单任务执行收 diff（#19 链路验证：harness 已在 #19 落地）----
         from cognicode.harness import WorktreeManager, run_task
 
         mgr = WorktreeManager(
             source_repo=repo_path,
             worktrees_dir=Path.cwd() / ".cognicode" / run_id / "worktrees",
         )
-        result = run_task(
-            executor=executor,
-            worktree_mgr=mgr,
-            prompt=(
-                "对当前仓库执行构建与测试，报告结果。"
-                "若构建或测试命令存在，运行它们并总结输出。"
-            ),
-            task_id="probe-demo",
-            run_dir=run_dir,
-            timeout_s=900,
-        )
-        if result is not None:
-            print(
-                f"[cognicode] 演示任务：ok={result.ok} "
-                f"exit={result.exit_code} turns={result.stats.num_turns} "
-                f"tokens={result.stats.total_tokens}"
-                f"\n  trace={result.trace_file}"
-                f"\n  diff={result.diff[:200]!r}..."
+        demo = suite["search"] + suite["locate"] + suite["modify"]
+        if demo:
+            result = run_task(
+                executor=executor,
+                worktree_mgr=mgr,
+                prompt=demo[0].prompt,
+                task_id=demo[0].id,
+                run_dir=run_dir,
+                timeout_s=900,
             )
-        else:
-            print("[cognicode] 演示任务：worktree 失败（fail_env）", file=sys.stderr)
+            if result is not None:
+                print(
+                    f"[cognicode] 演示任务（{demo[0].id}）：ok={result.ok} "
+                    f"exit={result.exit_code} turns={result.stats.num_turns} "
+                    f"tokens={result.stats.total_tokens}"
+                    f"\n  trace={result.trace_file}"
+                    f"\n  diff={result.diff[:200]!r}..."
+                )
+            else:
+                print(
+                    "[cognicode] 演示任务：worktree 失败（fail_env）",
+                    file=sys.stderr,
+                )
+    else:
+        print(
+            f"[cognicode] 探测失败：任务生成降级跳过（Q17）——"
+            f"本次仅静态面 + 探测（环境可用性低分信号，非评估失败）"
+        )
 
     if mode != "offline":
         print(
-            f"[cognicode] 动态测量（生成/判卷）尚未实现："
-            f"本次仅静态面 + 探测（#18/#19），后续票落地"
+            f"[cognicode] 动态判卷（F2P/P2P、位置匹配）尚未实现："
+            f"任务已生成并落盘 tasks.json，判卷归 #21"
         )
     return 0
 

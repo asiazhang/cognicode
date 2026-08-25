@@ -41,6 +41,22 @@ class TestScanWithHarness:
         assert "success" in data
         assert "exit_codes" in data
 
+    def test_scan_probe_success_generates_tasks(self, git_repo: Path, tmp_path, monkeypatch, capsys):
+        """探测成功 → 任务生成落盘 tasks.json（#20 接入 CLI）。"""
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setattr(
+            "cognicode.pi_executor.PiExecutor",
+            _FakePiExecutor,
+        )
+        assert main(["scan", "--offline", str(git_repo)]) == 0
+        run_dir = tmp_path / ".cognicode"
+        tasks_file = next(run_dir.glob("*/tasks.json"))
+        data = json.loads(tasks_file.read_text(encoding="utf-8"))
+        # 假仓库（composer.json 无源码符号）→ 任务可能为空，但结构完整
+        assert "counts" in data
+        assert "tasks" in data
+        assert set(data["counts"].keys()) == {"search", "locate", "modify"}
+
 
 class _FakePiExecutor:
     """替代 PiExecutor：不真跑 pi，探测命令直接成功。"""
