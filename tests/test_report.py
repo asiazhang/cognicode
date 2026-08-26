@@ -241,3 +241,69 @@ class TestSensitivitySection:
     def test_corpus_absent_shows_pending(self):
         r = render_report(_agg(), static_signals=_signals())
         assert "判据②（语料方向排序稳定）: 待语料" in r
+
+
+# ---------------------------------------------------------------------------
+# #23：归因管线并入（失败任务引用）+ 模块深度小节
+# ---------------------------------------------------------------------------
+
+class TestAttributionIntegration:
+    def test_attribution_suggestions_consumed(self):
+        """agg['attribution'] 存在 → 建议清单直接用归因管线产出（含失败引用）。"""
+        agg = _agg()
+        agg["attribution"] = {
+            "suggestions": [{
+                "anchor": "navigability.agent_context_docs",
+                "anchor_kind": "signal",
+                "text": "补充代理上下文文档（agent context document）",
+                "direction": "up",
+                "remeasurable": "重跑同一套任务与静态提取，用维度分区间判定方向移动",
+                "evidence": "信号 navigability.agent_context_docs 当前 0.0",
+                "failure_ref": "检索 2/3 失败（解出失败）",
+                "source": "template",
+                "priority": (0.25, 0.0, 0),
+            }],
+            "llm_groups": [],
+        }
+        r = render_report(agg, static_signals=_signals())
+        assert "失败任务引用（failed task reference）: 检索 2/3 失败（解出失败）" in r
+        assert "来源: 确定性模板（deterministic template）" in r
+
+    def test_llm_suggestion_source_label(self):
+        agg = _agg()
+        agg["attribution"] = {
+            "suggestions": [{
+                "anchor": "solvability",
+                "anchor_kind": "dimension",
+                "text": "LLM 建议",
+                "direction": "up",
+                "remeasurable": "重跑对应任务类，用维度分区间判定方向移动",
+                "evidence": "LLM 综合归因",
+                "failure_ref": "修改 2/5 失败（解出失败）",
+                "source": "llm",
+                "llm_rank": 0,
+                "priority": (0.4, 0.0, 0),
+            }],
+            "llm_groups": [],
+        }
+        r = render_report(agg, static_signals=_signals())
+        assert "来源: LLM 综合归因（LLM synthesis）" in r
+
+    def test_module_depth_section_rendered_when_enabled(self):
+        """模块深度开启 → 报告后半有模块深度小节（重构参考，不进产分）。"""
+        agg = _agg()
+        agg["module_depth"] = {
+            "enabled": True,
+            "modules": [{"module": "src/core.py", "label": "shallow"}],
+            "distribution": {"deep": 1, "shallow": 1, "unjudged": 0},
+            "suggestions": ["模块 src/core.py 判定为 shallow：建议合并小模块或加深接口"],
+        }
+        r = render_report(agg, static_signals=_signals())
+        assert "## 模块深度（module depth，重构参考）" in r
+        assert "deep 1 / shallow 1 / 未判定 0" in r
+        assert "src/core.py" in r
+
+    def test_module_depth_hidden_when_offline(self):
+        """模块深度关闭（--offline）→ 报告不渲染该小节。"""
+        r = render_report(_agg(), static_signals=_signals())
+        assert "## 模块深度" not in r

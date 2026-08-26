@@ -59,6 +59,12 @@ def _cmd_scan(args: argparse.Namespace) -> int:
     run_id = f"scan-{int(time.time())}"
     run_dir = Path.cwd() / ".cognicode" / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
+    # 记录被测仓库路径（report 的模块深度判定需要读仓库源码）
+    (run_dir / "run.json").write_text(
+        json.dumps({"repo": str(repo_path.resolve()), "mode": mode},
+                   ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
 
     from cognicode.static_signals import static_json
 
@@ -247,6 +253,57 @@ def _cmd_report(args: argparse.Namespace) -> int:
         repo_dims=repo_dims,
     )
 
+    # ---- 归因管线（#23：三档「确定性优先、LLM 兜底」）----
+    from cognicode.attribution import failure_sources, run_attribution
+
+    f = failure_sources(verdicts)
+    dim_points = {
+        d: (agg["dimensions"].get(d) or {}).get("point") for d in (
+            "solvability", "safety", "efficiency",
+            "navigability", "buildability", "diagnosability",
+        )
+    }
+    eff = (agg["dimensions"].get("efficiency") or {}).get("details")
+
+    # 专属归因信号（测试覆盖缺口 / 单文件规模）：未落盘（提取器留给后续票）
+    # → None → 只走产分信号档 + LLM 档
+    attr_signals = None
+    attr_file = run_dir / "attribution_signals.json"
+    if attr_file.exists():
+        attr_signals = _json.loads(attr_file.read_text(encoding="utf-8"))
+
+    llm = None
+    if dynamic_measured and not _run_offline(run_dir):
+        from cognicode.llm import PiLlmClient
+
+        llm = PiLlmClient()
+
+    traces = _load_traces(run_dir)
+    attr = run_attribution(
+        f, static.get("signals", {}),
+        llm=llm,
+        attribution_signals=attr_signals,
+        dim_points=dim_points,
+        efficiency=eff,
+        traces=traces,
+    )
+
+    # ---- 模块深度（#23/#14：LLM 判 deep/shallow 分布，重构参考，不进产分）----
+    md = None
+    repo_path = _repo_path_of(run_dir)
+    if llm is not None and repo_path is not None:
+        from cognicode.module_depth import run_module_depth
+
+        md = run_module_depth(repo_path, llm=llm, max_modules=20)
+
+    agg["attribution"] = {
+        "suggestions": attr["suggestions"],
+        "llm_groups": attr["llm_groups"],
+        "llm_calls": attr["llm_calls"],
+    }
+    if md is not None:
+        agg["module_depth"] = md
+
     agg_file = run_dir / "aggregate.json"
     agg_file.write_text(_json.dumps(agg, ensure_ascii=False, indent=2), encoding="utf-8")
     snap_file = run_dir / "snapshot.json"
@@ -266,6 +323,53 @@ def _cmd_report(args: argparse.Namespace) -> int:
     )
     print(f"[cognicode] 报告已落盘：{report_file}（report-schema {agg['snapshot'].get('report-schema')}）")
     return 0
+
+
+def _load_traces(run_dir: Path) -> dict[str, str]:
+    """读运行目录 traces/*.jsonl → {task_id: 轨迹文本}（LLM 证据包用）。
+
+    失败/缺目录 → 空 dict（LLM 归因的轨迹切片为空，不炸管线）。
+    """
+    traces: dict[str, str] = {}
+    trace_dir = run_dir / "traces"
+    if not trace_dir.is_dir():
+        return traces
+    for p in sorted(trace_dir.glob("*.jsonl")):
+        try:
+            traces[p.stem] = p.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+    return traces
+
+
+def _run_offline(run_dir: Path) -> bool:
+    """本次运行是否 offline（LLM 全关：归因走确定性档、模块深度关）。"""
+    rf = run_dir / "run.json"
+    if rf.exists():
+        try:
+            import json as _j
+
+            return _j.loads(rf.read_text(encoding="utf-8")).get("mode") == "offline"
+        except Exception:
+            pass
+    return False
+
+
+def _repo_path_of(run_dir: Path) -> Path | None:
+    """run.json 里记录的被测仓库路径（模块深度判定读源码用）。"""
+    rf = run_dir / "run.json"
+    if not rf.exists():
+        return None
+    try:
+        import json as _j
+
+        p = _j.loads(rf.read_text(encoding="utf-8")).get("repo")
+        if p:
+            pp = Path(p)
+            return pp if pp.is_dir() else None
+    except Exception:
+        pass
+    return None
 
 
 def main(argv: list[str] | None = None) -> int:

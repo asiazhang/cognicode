@@ -121,3 +121,72 @@ class TestReportCommand:
         agg = json.loads((run_dir / "aggregate.json").read_text(encoding="utf-8"))
         assert "note" in agg["sensitivity"]
         assert "不适用" in agg["sensitivity"]["note"]
+
+
+# ---------------------------------------------------------------------------
+# #23：归因管线 + 模块深度接入 report 命令
+# ---------------------------------------------------------------------------
+
+class TestReportAttribution:
+    def test_report_runs_attribution_offline_deterministic(self, tmp_path, monkeypatch, capsys):
+        """offline 运行 → 归因走确定性档（无 LLM 建议），报告带失败任务引用。"""
+        monkeypatch.chdir(tmp_path)
+        run_dir = _make_run_dir(
+            tmp_path,
+            verdicts={"tasks": [
+                {"task_id": "search-1", "kind": "search", "k": 3,
+                 "outcomes": ["fail_incorrect", "fail_incorrect", "success"]},
+                {"task_id": "modify-1", "kind": "modify", "k": 5,
+                 "outcomes": ["fail_incorrect"] * 2 + ["success"] * 3},
+            ]},
+        )
+        # 标记 offline（LLM 全关）
+        (run_dir / "run.json").write_text(
+            '{"repo": "/tmp/x", "mode": "offline"}', encoding="utf-8")
+        assert main(["report", "run-1"]) == 0
+        agg = json.loads((run_dir / "aggregate.json").read_text(encoding="utf-8"))
+        attr = agg["attribution"]
+        assert attr["llm_calls"] == 0  # offline 不调 LLM
+        assert all(s["source"] != "llm" for s in attr["suggestions"])
+        md = (tmp_path / "cognicode-report.md").read_text(encoding="utf-8")
+        # 检索失败 + 文档信号缺失 → 模板建议带失败任务引用
+        assert "失败任务引用（failed task reference）" in md
+        assert "## 模块深度" not in md  # offline 模块深度关闭
+
+    def test_report_llm_attribution_skipped_when_no_llm_available(self, tmp_path, monkeypatch, capsys):
+        """非 offline 但 LLM 不可用（调用失败 None）→ 兜底不炸管线。"""
+        monkeypatch.chdir(tmp_path)
+        run_dir = _make_run_dir(
+            tmp_path,
+            verdicts={"tasks": [
+                {"task_id": "locate-1", "kind": "locate", "k": 3,
+                 "outcomes": ["fail_budget", "fail_budget", "fail_budget"]},
+            ]},
+        )
+        (run_dir / "run.json").write_text(
+            '{"repo": "/tmp/x", "mode": "full"}', encoding="utf-8")
+        # PiLlmClient 指向不存在的 pi → complete 返回 None → 归因跳过
+        import cognicode.llm as llm_mod
+
+        class _NoLLM:
+            def complete(self, prompt, *, model=None):
+                return None
+
+        monkeypatch.setattr(llm_mod, "PiLlmClient", lambda *a, **k: _NoLLM())
+        assert main(["report", "run-1"]) == 0
+        agg = json.loads((run_dir / "aggregate.json").read_text(encoding="utf-8"))
+        # LLM 输出 None → 丢弃；llm_groups 记录未归因组
+        assert all(s["source"] != "llm" for s in agg["attribution"]["suggestions"])
+        assert agg["attribution"]["llm_groups"]
+
+    def test_report_traces_loaded_for_evidence(self, tmp_path, monkeypatch, capsys):
+        """轨迹切片读入证据包（LLM 归因输入），不炸缺目录。"""
+        monkeypatch.chdir(tmp_path)
+        run_dir = _make_run_dir(tmp_path, verdicts={"tasks": []})
+        (run_dir / "traces").mkdir()
+        (run_dir / "traces" / "search-1.jsonl").write_text(
+            '{"type": "turn_start"}\n{"type": "tool_execution_start", "toolName": "read", "input": {"file_path": "a.py"}}\n',
+            encoding="utf-8")
+        (run_dir / "run.json").write_text(
+            '{"repo": "/tmp/x", "mode": "offline"}', encoding="utf-8")
+        assert main(["report", "run-1"]) == 0

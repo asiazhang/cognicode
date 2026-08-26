@@ -135,7 +135,19 @@ def _build_suggestions(agg: dict, static_signals: dict | None) -> list[dict]:
 
     排序（#8 #8）：维度分最低优先 → 信号档位最低优先。
     LLM 综合/重排归 #23；本票只出确定性模板条。
+
+    Args:
+        agg: aggregate_run 输出（含 run_attribution 的 suggestions 时直接消费
+            ——#23 归因管线已并入失败任务引用；无则退化为旧确定性逻辑）。
+        static_signals: 静态信号原始值（{signal: {score, value, evidence}}）。
     """
+    # #23：归因管线产出（含确定性 + LLM 档、失败任务引用、排序键）
+    from_attr = agg.get("attribution", {})
+    if from_attr:
+        sugg = list(from_attr.get("suggestions", []))
+        sugg.sort(key=lambda s: (s.get("priority", (1.0,)), s.get("llm_rank", -1)))
+        return sugg
+
     suggestions: list[dict] = []
     dims = agg.get("dimensions", {})
 
@@ -275,6 +287,14 @@ def render_report(
             )
             lines.append(f"   - 可重测声明（re-measurability claim）: {s['remeasurable']}")
             lines.append(f"   - 证据: {s['evidence']}")
+            ref = s.get("failure_ref") or ""
+            if ref:
+                lines.append(f"   - 失败任务引用（failed task reference）: {ref}")
+            src = s.get("source")
+            if src:
+                lines.append(
+                    f"   - 来源: {'LLM 综合归因（LLM synthesis）' if src == 'llm' else '确定性模板（deterministic template）'}"
+                )
     lines.append("")
 
     if terminal:
@@ -283,6 +303,19 @@ def render_report(
         lines.append("")
         lines.extend(_render_sensitivity_lines(agg, terminal=True))
         lines.append("")
+        # 模块深度（#23：#14 归因信号，参考性重构建议）
+        md = agg.get("module_depth") or {}
+        if md.get("enabled"):
+            dist = md.get("distribution", {})
+            lines.append("## 模块深度（module depth，重构参考）")
+            lines.append("")
+            lines.append(
+                f"- 已判定 {sum(dist.values())} 个模块：deep {dist.get('deep', 0)} / "
+                f"shallow {dist.get('shallow', 0)} / 未判定 {dist.get('unjudged', 0)}"
+            )
+            for s in (md.get("suggestions") or [])[:5]:
+                lines.append(f"  - {s}")
+            lines.append("")
         lines.append("## 附录（appendix）")
         lines.append("")
         lines.append(f"- 运行环境快照: {json_dumps(snapshot)}")
@@ -293,6 +326,21 @@ def render_report(
     lines.append("")
     lines.extend(_render_sensitivity_lines(agg))
     lines.append("")
+
+    # ---- 模块深度小节（#23/#14：归因信号，重构参考清单，不进产分）----
+    md = agg.get("module_depth") or {}
+    if md.get("enabled"):
+        dist = md.get("distribution", {})
+        lines.append("## 模块深度（module depth，重构参考）")
+        lines.append("")
+        lines.append(
+            f"- 已判定 {sum(dist.values())} 个模块："
+            f"deep {dist.get('deep', 0)} / shallow {dist.get('shallow', 0)} / "
+            f"未判定 {dist.get('unjudged', 0)}（判定属参考性，不进产分，ADR-0004）"
+        )
+        for s in (md.get("suggestions") or [])[:10]:
+            lines.append(f"- {s}")
+        lines.append("")
 
     # ---- 附录 ----
     lines.append("## 附录（appendix）")

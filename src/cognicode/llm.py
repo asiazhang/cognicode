@@ -69,29 +69,36 @@ class PiLlmClient:
         self.pi_cmd = pi_cmd if pi_cmd is not None else ["pi"]
 
     def complete(self, prompt: str, *, model: str | None = None) -> str | None:
-        """单次生成调用：返回模型文本；任何失败返回 None（调用方兜底）。"""
+        """单次生成调用：返回模型文本；任何失败返回 None（调用方兜底）。
+
+        用 `-p --mode json`（单发 JSON 事件流，跑完退出）：RPC 长驻形态在
+        本机 0.84.3 headless 下实测不产出 assistant 轮（#23 冒烟），
+        单发形态事件流完整（message_end 带最终文本）。
+        """
         model = model or self.config.model
         try:
             proc = subprocess.run(
                 self.pi_cmd + [
-                    "--mode", "rpc",
+                    "-p", "--mode", "json",
                     "--model", model,
                     "--no-session", "--no-approve", "-nc",
                     "--no-skills", "--no-prompt-templates", "--no-themes",
-                ],
-                input=json.dumps({"type": "prompt", "message": prompt}) + "\n",
+                ] + [prompt],
                 capture_output=True,
                 text=True,
                 timeout=self.config.timeout_s,
             )
         except Exception:
             return None
-        # 取最后一条 assistant 文本（简单解析：agent_settled 前的 message）
         return _extract_last_text(proc.stdout)
 
 
 def _extract_last_text(stdout: str) -> str | None:
-    """从 pi RPC stdout（JSONL）提取最后一条 assistant 文本；失败返回 None。"""
+    """从 pi 单发 JSON 事件流（--mode json）提取最后一条 assistant 文本。
+
+    最终文本在 `message_end` 的 message.content[].text（#23 实测）；
+    也兼容 `message_start` 直接带文本的形态。失败返回 None。
+    """
     last = None
     for line in stdout.splitlines():
         line = line.strip()
@@ -102,6 +109,12 @@ def _extract_last_text(stdout: str) -> str | None:
         except Exception:
             continue
         if ev.get("type") == "message_start":
+            msg = ev.get("message") or {}
+            if msg.get("role") == "assistant":
+                for block in msg.get("content") or []:
+                    if block.get("type") == "text" and block.get("text"):
+                        last = block["text"]
+        elif ev.get("type") == "message_end":
             msg = ev.get("message") or {}
             if msg.get("role") == "assistant":
                 for block in msg.get("content") or []:
