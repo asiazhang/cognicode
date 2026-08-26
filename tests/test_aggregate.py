@@ -295,3 +295,20 @@ class TestAggregateRun:
 
     def test_dyn_static_split_pinned(self):
         assert DYN_STATIC_SPLIT == 0.7  # #8 钉死 70/30
+
+    def test_sensitivity_produced_with_verdicts(self):
+        """动态已测 → aggregate 产出敏感性小节（判据①）。"""
+        agg = aggregate_run(_verdicts(), static=_static(), medians=_medians())
+        sens = agg["sensitivity"]
+        assert sens["grid"]["n_weights"] == 15625
+        assert sens["dirichlet"]["n_samples"] == 200
+        assert "criterion_pass" in sens["grid"]
+        assert sens["corpus"] == {"present": False}  # 语料未注入
+
+    def test_sensitivity_note_when_dynamic_not_measured(self):
+        """探测失败 → 敏感性标不适用（总分未测，无点值可扰）。"""
+        agg = aggregate_run(
+            _verdicts(), static=_static(), dynamic_measured=False,
+        )
+        assert "note" in agg["sensitivity"]
+        assert "不适用" in agg["sensitivity"]["note"]

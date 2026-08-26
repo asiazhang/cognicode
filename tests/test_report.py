@@ -54,6 +54,17 @@ def _agg(**overrides):
             "config": {"weights": {"solvability": 1 / 6}},
             "run": {"run_id": "run-1", "dynamic_measured": True},
         },
+        "sensitivity": {
+            "grid": {"bandwidth": 0.03125, "criterion_pass": True,
+                      "n_weights": 15625,
+                      "sweep": {
+                          "solvability": {"effect": 0.016, "low_tier_avg": 0.49, "high_tier_avg": 0.51},
+                          "navigability": {"effect": 0.034, "low_tier_avg": 0.48, "high_tier_avg": 0.52},
+                      }},
+            "dirichlet": {"bandwidth": 0.029, "criterion_pass": True,
+                           "n_samples": 200, "alpha": 12.0, "seed": None},
+            "corpus": {"present": False},
+        },
         "verdicts": {"counts": {"modify": 3, "search": 2, "locate": 1}, "removed_all_same": [], "tasks_included": 4},
         "removed": [],
     }
@@ -176,3 +187,57 @@ class TestTerminalSummary:
     def test_terminal_no_ansi(self):
         r = render_terminal_summary(_agg(), static_signals=_signals())
         assert "\x1b[" not in r
+
+
+class TestSensitivitySection:
+    def test_render_sensitivity_judgement(self):
+        """敏感性小节渲染带宽与判据①通过/失败（#22）。"""
+        r = render_report(_agg(), static_signals=_signals())
+        assert "## 权重敏感性分析（weight sensitivity analysis）" in r
+        assert "网格 15625 组 带宽 0.031" in r
+        assert "≤0.05 ✓" in r
+        assert "总分对权重选择 稳健（pass）" in r
+
+    def test_render_failed_bandwidth(self):
+        """带宽超限 → 标注不稳健（判据① fail）。"""
+        agg = _agg()
+        agg["sensitivity"] = {
+            "grid": {"bandwidth": 0.12, "criterion_pass": False,
+                      "n_weights": 15625, "sweep": {}},
+            "dirichlet": {"bandwidth": 0.09, "criterion_pass": False,
+                           "n_samples": 200, "alpha": 12.0, "seed": None},
+            "corpus": {"present": False},
+        }
+        r = render_report(agg, static_signals=_signals())
+        assert ">0.05 ✗" in r
+        assert "不稳健（fail）" in r
+
+    def test_render_missing_sensitivity_note(self):
+        """动态面未测 → 敏感性标注不适用。"""
+        agg = _agg()
+        agg["sensitivity"] = {"note": "动态面未测（总分未测），权重敏感性不适用"}
+        r = render_report(agg, static_signals=_signals())
+        assert "动态面未测（总分未测）" in r
+
+    def test_terminal_summary_has_sensitivity_line(self):
+        r = render_terminal_summary(_agg(), static_signals=_signals())
+        assert "## 权重敏感性分析" in r
+        assert "带宽 0.031" in r
+
+    def test_corpus_direction_rendered_when_present(self):
+        """判据②：语料各仓方向注入后渲染排序稳定性。"""
+        agg = _agg()
+        agg["sensitivity"]["corpus"] = {
+            "present": True,
+            "repos": ["nbnbk", "Melissa-Core"],
+            "stable": True,
+            "unstable_pairs": [],
+        }
+        r = render_report(agg, static_signals=_signals())
+        assert "判据②（语料方向排序稳定）" in r
+        assert "nbnbk > Melissa-Core" in r
+        assert "✓ 稳定" in r
+
+    def test_corpus_absent_shows_pending(self):
+        r = render_report(_agg(), static_signals=_signals())
+        assert "判据②（语料方向排序稳定）: 待语料" in r

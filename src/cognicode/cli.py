@@ -232,12 +232,19 @@ def _cmd_report(args: argparse.Namespace) -> int:
     # ---- 聚合（#21）----
     from cognicode.aggregate import aggregate_run
 
+    # 语料各仓六维点值（敏感性判据②方向稳定性；缺 → 报告标「待语料」）
+    repo_dims = None
+    corpus_file = run_dir / "corpus.json"
+    if corpus_file.exists():
+        repo_dims = _json.loads(corpus_file.read_text(encoding="utf-8"))
+
     agg = aggregate_run(
         verdicts,
         static=static,
         medians=medians,
         dynamic_measured=dynamic_measured,
         run_id=run_id,
+        repo_dims=repo_dims,
     )
 
     agg_file = run_dir / "aggregate.json"

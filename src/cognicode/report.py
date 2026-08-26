@@ -278,20 +278,20 @@ def render_report(
     lines.append("")
 
     if terminal:
-        # 终端摘要：三层 + 敏感性占位 + 快照摘要一行
+        # 终端摘要：三层 + 敏感性一行 + 快照摘要一行
         lines.append("## 权重敏感性分析（weight sensitivity）")
         lines.append("")
-        lines.append("- 待 #22 敏感性分析模块产出（网格 5⁶ + Dirichlet 200）")
+        lines.extend(_render_sensitivity_lines(agg, terminal=True))
         lines.append("")
         lines.append("## 附录（appendix）")
         lines.append("")
         lines.append(f"- 运行环境快照: {json_dumps(snapshot)}")
         return "\n".join(lines)
 
-    # ---- 敏感性小节（独立放后半，#12 #3-4）----
+    # ---- 敏感性小节（独立放后半，#12 #3-4，内容由 #22 产出）----
     lines.append("## 权重敏感性分析（weight sensitivity analysis）")
     lines.append("")
-    lines.append("- 待 #22 实现：确定性网格 5⁶ 全枚举 + Dirichlet 采样 200，判据总分带宽 ≤0.05。")
+    lines.extend(_render_sensitivity_lines(agg))
     lines.append("")
 
     # ---- 附录 ----
@@ -314,6 +314,80 @@ def render_report(
         lines.append("- （无静态信号数据）")
     lines.append("")
     return "\n".join(lines)
+
+
+def _render_sensitivity_lines(agg: dict, terminal: bool = False) -> list[str]:
+    """敏感性小节文本（#22 产出；内容见 agg['sensitivity']）。
+
+    判据①：网格 5⁶ + Dirichlet 200 的总分点值带宽 ≤0.05（#10），附每维
+    档位净影响（提高该维权重对总分的拉动方向）。判据②（语料方向排序
+    稳定）需语料各仓六维点值——由调用方经 agg['sensitivity']['corpus']
+    注入；缺 → 标注「待语料」。
+    """
+    sens = agg.get("sensitivity") or {}
+    lines: list[str] = []
+    if sens.get("note"):
+        lines.append(f"- {sens['note']}")
+        return lines
+
+    grid = sens.get("grid") or {}
+    dirl = sens.get("dirichlet") or {}
+    bw = grid.get("bandwidth")
+    if bw is None:
+        lines.append("- 敏感性数据缺失（aggregate 未产出）")
+        return lines
+
+    g_pass = grid.get("criterion_pass", False)
+    d_pass = dirl.get("criterion_pass", False)
+    verdict = "稳健（pass）" if (g_pass and d_pass) else "不稳健（fail）"
+    lines.append(
+        f"- 判据①（带宽 ≤0.05）: 网格 {grid.get('n_weights', '?')} 组 "
+        f"带宽 {bw:.3f}（{'≤0.05 ✓' if g_pass else '>0.05 ✗'}）；"
+        f"Dirichlet {dirl.get('n_samples', '?')} 次带宽 "
+        f"{(dirl.get('bandwidth') or 0.0):.3f}"
+        f"（{'≤0.05 ✓' if d_pass else '>0.05 ✗'}）→ 总分对权重选择 {verdict}"
+    )
+    if terminal:
+        return lines
+
+    # 每维净影响（提高该维权重对总分的拉动方向；0.5 = 中性）
+    sweep = grid.get("sweep") or {}
+    parts = []
+    for d in DIMENSIONS:
+        s = sweep.get(d) or {}
+        eff = s.get("effect")
+        if eff is None:
+            continue
+        mark = "↑" if eff > 0.0005 else ("↓" if eff < -0.0005 else "·")
+        parts.append(f"{DIMENSION_LABELS_ZH.get(d, d)} {mark}{eff:+.3f}")
+    lines.append(
+        "- 每维权重从最低档拉到最高档对总分点值的净影响（0–1 标尺）: "
+        + "，".join(parts)
+    )
+
+    # 判据②（语料方向排序稳定；需各仓六维点值）
+    corpus = sens.get("corpus") or {}
+    if corpus.get("present") is False or not corpus.get("repos"):
+        lines.append(
+            "- 判据②（语料方向排序稳定）: 待语料——需各仓六维点值注入"
+            "（校准验证阶段输出，MVP done 前以判据①为准）"
+        )
+    else:
+        order = " > ".join(corpus.get("repos", []))
+        pairs = corpus.get("unstable_pairs", [])
+        if corpus.get("stable"):
+            st = "✓ 稳定（相邻序位差 ≥ 2×带宽）"
+        else:
+            st = "✗ 不稳定（相邻序位差 < 2×带宽）"
+        lines.append(f"- 判据②（语料方向排序稳定）: {order} —— {st}")
+        if pairs:
+            lines.append(
+                "  - 敏感序位对（点值差 < 2×带宽）: "
+                + "，".join(
+                    f"{a}/{b}（差 {d:.3f}）" for a, b, d in pairs
+                )
+            )
+    return lines
 
 
 def json_dumps(obj) -> str:

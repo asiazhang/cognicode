@@ -90,3 +90,34 @@ class TestReportCommand:
         monkeypatch.chdir(tmp_path)
         (tmp_path / ".cognicode" / "run-x").mkdir(parents=True)
         assert main(["report", "run-x"]) == 1
+
+    def test_report_includes_sensitivity(self, tmp_path, monkeypatch, capsys):
+        """report 落盘 aggregate.json 含敏感性小节 + 报告渲染判据①。"""
+        monkeypatch.chdir(tmp_path)
+        run_dir = _make_run_dir(
+            tmp_path,
+            verdicts={"tasks": [
+                {"task_id": "modify-1", "kind": "modify", "k": 5,
+                 "outcomes": ["success"] * 3 + ["fail_incorrect"] * 2},
+                {"task_id": "search-1", "kind": "search", "k": 3,
+                 "outcomes": ["success", "success", "fail_incorrect"]},
+            ]},
+        )
+        assert main(["report", "run-1"]) == 0
+        agg = json.loads((run_dir / "aggregate.json").read_text(encoding="utf-8"))
+        sens = agg["sensitivity"]
+        assert sens["grid"]["n_weights"] == 15625
+        assert sens["dirichlet"]["n_samples"] == 200
+        assert "bandwidth" in sens["grid"]
+        md = (tmp_path / "cognicode-report.md").read_text(encoding="utf-8")
+        assert "## 权重敏感性分析（weight sensitivity analysis）" in md
+        assert "网格 15625 组" in md
+
+    def test_report_probe_fail_sensitivity_note(self, tmp_path, monkeypatch, capsys):
+        """探测失败 → 敏感性标 not-applicable（总分未测）。"""
+        monkeypatch.chdir(tmp_path)
+        run_dir = _make_run_dir(tmp_path, probe_success=False)
+        assert main(["report", "run-1"]) == 0
+        agg = json.loads((run_dir / "aggregate.json").read_text(encoding="utf-8"))
+        assert "note" in agg["sensitivity"]
+        assert "不适用" in agg["sensitivity"]["note"]
