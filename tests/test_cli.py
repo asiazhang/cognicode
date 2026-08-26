@@ -26,8 +26,9 @@ class TestCli:
         # 不存在的目录 → 报错退出码 1（不做空跑）
         assert main(["scan", "/tmp/definitely-not-a-repo-xyz"]) == 1
 
-    def test_report_accepts_run_id(self, capsys):
-        assert main(["report", "run-123"]) == 0
+    def test_report_missing_run_dir_rejected(self, capsys):
+        # 不存在的运行目录 → 报错退出码 1
+        assert main(["report", "run-123"]) == 1
 
     def test_missing_subcommand_rejected(self):
         with pytest.raises(SystemExit):

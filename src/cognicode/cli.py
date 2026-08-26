@@ -189,10 +189,75 @@ def _cmd_scan(args: argparse.Namespace) -> int:
 
 
 def _cmd_report(args: argparse.Namespace) -> int:
-    print(
-        f"[cognicode] report 生成尚未实现："
-        f"运行 {args.run_id!r} 的报告由后续构建票落地"
+    """从运行目录生成报告（#21）：聚合 + 落盘 cognicode-report.md。
+
+    输入：.cognicode/<run-id>/（static.json / verdicts.json / tasks.json /
+    traces/diffs / probe.json）。verdicts.json 缺失（未判卷）→ 聚合层按
+    无动态样本处理（静态面仍出分）；探测失败 → 整体降级（只出静态分）。
+    """
+    import json as _json
+
+    run_id = args.run_id
+    run_dir = Path.cwd() / ".cognicode" / run_id
+    if not run_dir.is_dir():
+        print(f"[cognicode] 错误：运行目录不存在 {run_dir}", file=sys.stderr)
+        return 1
+
+    # ---- 静态信号（#18 产物）----
+    static_file = run_dir / "static.json"
+    if not static_file.exists():
+        print(f"[cognicode] 错误：缺少 static.json（运行未完成静态提取）", file=sys.stderr)
+        return 1
+    static = _json.loads(static_file.read_text(encoding="utf-8"))
+
+    # ---- 判卷结果（#21 verdicts.json；缺失 = 未判卷）----
+    verdicts = {"tasks": []}
+    vfile = run_dir / "verdicts.json"
+    if vfile.exists():
+        verdicts = _json.loads(vfile.read_text(encoding="utf-8"))
+
+    # ---- 探测（#19 产物）：探测失败 → 动态面未测降级 ----
+    dynamic_measured = True
+    probe_file = run_dir / "probe.json"
+    if probe_file.exists():
+        probe = _json.loads(probe_file.read_text(encoding="utf-8"))
+        dynamic_measured = bool(probe.get("success", True))
+
+    # ---- 效率中位数（success 运行，来自 verdicts 或 traces；缺 = 未采集）----
+    medians = None
+    med_file = run_dir / "medians.json"
+    if med_file.exists():
+        medians = _json.loads(med_file.read_text(encoding="utf-8"))
+
+    # ---- 聚合（#21）----
+    from cognicode.aggregate import aggregate_run
+
+    agg = aggregate_run(
+        verdicts,
+        static=static,
+        medians=medians,
+        dynamic_measured=dynamic_measured,
+        run_id=run_id,
     )
+
+    agg_file = run_dir / "aggregate.json"
+    agg_file.write_text(_json.dumps(agg, ensure_ascii=False, indent=2), encoding="utf-8")
+    snap_file = run_dir / "snapshot.json"
+    snap_file.write_text(
+        _json.dumps(agg["snapshot"], ensure_ascii=False, indent=2), encoding="utf-8")
+
+    # ---- 报告（#12）：终端摘要 + 全量落盘 cognicode-report.md ----
+    from cognicode.report import render_report, render_terminal_summary
+
+    signals = static.get("signals", {})
+    print(render_terminal_summary(agg, static_signals=signals))
+    print()
+    report_file = Path.cwd() / "cognicode-report.md"
+    report_file.write_text(
+        render_report(agg, static_signals=signals),
+        encoding="utf-8",
+    )
+    print(f"[cognicode] 报告已落盘：{report_file}（report-schema {agg['snapshot'].get('report-schema')}）")
     return 0
 
 
