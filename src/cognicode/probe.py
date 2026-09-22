@@ -198,12 +198,16 @@ def probe_success(exit_codes: dict[str, int]) -> tuple[bool, str]:
     build_ok = any(v == 0 for v in builds.values())
     test_ok = any(v == 0 for v in tests.values())
 
+    if not builds and not tests:
+        return False, "无构建命令可探测（仓库未声明构建）；无测试命令可探测（仓库未声明测试）"
     if not builds:
         return False, "无构建命令可探测（仓库未声明构建）"
     if not tests:
         return False, "无测试命令可探测（仓库未声明测试）"
     if build_ok and test_ok:
         return True, "构建与测试均至少一条 exit 0"
+    if not build_ok and not test_ok:
+        return False, "构建全灭（无任何构建 exit 0）；测试全灭（无任何测试 exit 0）"
     if not build_ok:
         return False, "构建全灭（无任何构建 exit 0）"
     return False, "测试全灭（无任何测试 exit 0）"

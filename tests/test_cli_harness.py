@@ -19,8 +19,9 @@ def git_repo(tmp_path: Path):
     subprocess.run(["git", "init", "-q", str(repo)], check=True)
     subprocess.run(["git", "-C", str(repo), "config", "user.email", "t@t"], check=True)
     subprocess.run(["git", "-C", str(repo), "config", "user.name", "t"], check=True)
-    (repo / "composer.json").write_text(
-        '{"scripts": {"build": "true", "test": "true"}}', encoding="utf-8")
+    (repo / "Makefile").write_text(
+        "build:\n\ttrue\n"
+        "test:\n\ttrue\n", encoding="utf-8")
     subprocess.run(["git", "-C", str(repo), "add", "-A"], check=True)
     subprocess.run(["git", "-C", str(repo), "commit", "-qm", "init"], check=True)
     return repo

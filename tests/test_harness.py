@@ -84,7 +84,7 @@ class TestProbeRunner:
         subprocess.run(["git", "init", "-q", str(repo)], check=True)
         subprocess.run(["git", "-C", str(repo), "config", "user.email", "t@t"], check=True)
         subprocess.run(["git", "-C", str(repo), "config", "user.name", "t"], check=True)
-        (repo / "composer.json").write_text(
+        (repo / "package.json").write_text(
             '{"scripts": {"build": "true", "test": "true"}}', encoding="utf-8")
         subprocess.run(["git", "-C", str(repo), "add", "-A"], check=True)
         subprocess.run(["git", "-C", str(repo), "commit", "-qm", "init"], check=True)
@@ -96,7 +96,7 @@ class TestProbeRunner:
         runner = ProbeRunner(executor=ex)
         result = runner.run(repo)
         assert result["success"] is True
-        assert result["exit_codes"]["build.composer"] == 0
+        assert result["exit_codes"]["build.package"] == 0
 
     def test_probe_fail_all_degrades(self, tmp_path: Path):
         repo = tmp_path / "repo2"
@@ -116,6 +116,60 @@ class TestProbeRunner:
         result = runner.run(repo)
         assert result["success"] is False
         assert result["degrade"] is True  # 探测全灭 → 整体降级
+
+    def test_probe_uses_command_exit_code_not_agent_exit_code(self, tmp_path: Path):
+        """Agent 正常收尾不能掩盖真实测试命令的失败。"""
+        repo = tmp_path / "repo3"
+        repo.mkdir()
+        subprocess.run(["git", "init", "-q", str(repo)], check=True)
+        subprocess.run(["git", "-C", str(repo), "config", "user.email", "t@t"], check=True)
+        subprocess.run(["git", "-C", str(repo), "config", "user.name", "t"], check=True)
+        (repo / "package.json").write_text(
+            '{"scripts": {"build": "true", "test": "node -e \\\"process.exit(7)\\\""}}',
+            encoding="utf-8",
+        )
+        subprocess.run(["git", "-C", str(repo), "add", "-A"], check=True)
+        subprocess.run(["git", "-C", str(repo), "commit", "-qm", "init"], check=True)
+
+        # 两次 Agent 都是正常退出；判定必须消费 Makefile 命令的真实退出码。
+        ex = FakeExecutor([
+            RunResult(ok=True, exit_code=0, outcome_note="settled"),
+            RunResult(ok=True, exit_code=0, outcome_note="settled"),
+        ])
+        result = ProbeRunner(executor=ex).run(repo)
+
+        assert result["success"] is False
+        assert result["exit_codes"] == {"build.package": 0, "test.package": 7}
+        assert result["command_exit_codes"] == result["exit_codes"]
+        assert result["agent_exit_codes"] == {"build.package": 0, "test.package": 0}
+        assert any("test.package" in note and "exit 7" in note for note in result["notes"])
+        assert result["diagnostics"]["test.package"]["stderr_tail"] == ""
+
+    def test_probe_records_agent_failure_and_command_success(self, tmp_path: Path):
+        """命令级退出码和 Agent 进程退出码分别留档。"""
+        repo = tmp_path / "repo4"
+        repo.mkdir()
+        subprocess.run(["git", "init", "-q", str(repo)], check=True)
+        subprocess.run(["git", "-C", str(repo), "config", "user.email", "t@t"], check=True)
+        subprocess.run(["git", "-C", str(repo), "config", "user.name", "t"], check=True)
+        (repo / "Makefile").write_text(
+            "build:\n\ttrue\n"
+            "test:\n\ttrue\n",
+            encoding="utf-8",
+        )
+        subprocess.run(["git", "-C", str(repo), "add", "-A"], check=True)
+        subprocess.run(["git", "-C", str(repo), "commit", "-qm", "init"], check=True)
+
+        ex = FakeExecutor([
+            RunResult(ok=False, exit_code=1, outcome_note="进程提前退出 rc=1"),
+            RunResult(ok=False, exit_code=1, outcome_note="进程提前退出 rc=1"),
+        ])
+        result = ProbeRunner(executor=ex).run(repo)
+
+        assert result["success"] is True
+        assert result["exit_codes"] == {"build.makefile": 0, "test.makefile": 0}
+        assert result["agent_exit_codes"] == {"build.makefile": 1, "test.makefile": 1}
+        assert any("Agent" in note and "build.makefile" in note for note in result["notes"])
 
 
 class MutatingExecutor:

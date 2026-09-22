@@ -49,11 +49,12 @@ uv run python scripts/smoke_e2e.py --offline --tasks 2 # 减量（链路验证�
 
 ### 2. 探测采集口径缺陷（冒烟暴露，已在本脚本规避）
 
-`ProbeRunner` 原实现让 pi agent 执行探测命令，`exit_codes` 记录的是
-**agent 进程退出码**（agent 正常收尾 = 0），不是**命令真实退出码**
-（phpunit Fatal 255 / pytest collection error 2 也被记成 0）。
-本脚本改为**直接执行命令**记录真实退出码，避免该伪影。
-（probe.py 的 agent 包装路径保留用于真实执行；冒烟用直接执行验证判定。）
+历史实现让 pi agent 执行探测命令，`exit_codes` 记录的是**agent 进程退出码**
+（agent 正常收尾 = 0），不是**命令真实退出码**（phpunit Fatal 255 / pytest
+collection error 2 也被记成 0）。当前 `ProbeRunner` 已修复：用独立 fresh
+worktree 直接执行已定位命令，`exit_codes`/`command_exit_codes` 记录真实命令码，
+`agent_exit_codes` 另存 Agent 进程码；本脚本仍保留直接执行路径用于独立验证，
+避免将探测判定回归为 Agent 包装码。
 
 ### 3. 方向验证的约束
 

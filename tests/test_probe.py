@@ -91,6 +91,7 @@ class TestProbeSuccess:
         ok, reason = probe_success({"build.composer": 1, "test.phpunit": 1})
         assert ok is False
         assert "构建全灭" in reason
+        assert "测试全灭" in reason
 
     def test_missing_build(self):
         ok, reason = probe_success({"test.phpunit": 0})
@@ -102,6 +103,8 @@ class TestProbeSuccess:
         assert ok is False
         assert "无测试命令" in reason
 
-    def test_empty(self):
+    def test_missing_build_and_test(self):
         ok, reason = probe_success({})
         assert ok is False
+        assert "无构建命令" in reason
+        assert "无测试命令" in reason

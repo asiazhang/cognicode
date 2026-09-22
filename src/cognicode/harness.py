@@ -80,6 +80,55 @@ class WorktreeManager:
         return wt_dir
 
 
+def _run_probe_command(command: list[str], worktree: Path) -> dict[str, str | int]:
+    """在探测 worktree 中执行真实命令并保留可审计诊断。
+
+    返回值使用 shell 命令的退出码，而不是 ``Executor`` 的 Agent 进程码。
+    命令定位器产出 argv，因此不使用 shell=True，避免探测命令注入。
+    """
+    try:
+        completed = subprocess.run(
+            command,
+            cwd=worktree,
+            capture_output=True,
+            text=True,
+            timeout=PROBE_TIMEOUT_S,
+        )
+        return {
+            "exit_code": completed.returncode,
+            "stdout_tail": completed.stdout[-2000:],
+            "stderr_tail": completed.stderr[-2000:],
+            "error": "",
+        }
+    except subprocess.TimeoutExpired as exc:
+        stdout = exc.stdout or ""
+        stderr = exc.stderr or ""
+        if isinstance(stdout, bytes):
+            stdout = stdout.decode(errors="replace")
+        if isinstance(stderr, bytes):
+            stderr = stderr.decode(errors="replace")
+        return {
+            "exit_code": 124,
+            "stdout_tail": stdout[-2000:],
+            "stderr_tail": stderr[-2000:],
+            "error": f"命令超时（>{PROBE_TIMEOUT_S}s）",
+        }
+    except FileNotFoundError as exc:
+        return {
+            "exit_code": 127,
+            "stdout_tail": "",
+            "stderr_tail": "",
+            "error": str(exc),
+        }
+    except OSError as exc:
+        return {
+            "exit_code": 126,
+            "stdout_tail": "",
+            "stderr_tail": "",
+            "error": str(exc),
+        }
+
+
 class ProbeRunner:
     """环境探测执行器：定位命令 → worktree 内逐条执行 → 判定。"""
 
@@ -93,40 +142,96 @@ class ProbeRunner:
             {
               "success": bool,        # probe_success 判定
               "degrade": bool,        # 探测全灭 → 整体降级（fail_env 路径）
-              "exit_codes": {name: code},
-              "durations": {name: ms},
+              "exit_codes": {name: code},  # 命令真实退出码（兼容字段）
+              "command_exit_codes": {name: code},
+              "agent_exit_codes": {name: code},
+              "durations": {name: ms},  # 命令执行耗时
+              "diagnostics": {name: {...}},
               "notes": [...],
             }
         """
         commands, notes = locate_probe_commands(repo)
-        exit_codes: dict[str, int] = {}
+        # ``exit_codes`` 的正式语义是命令退出码；不要把 Agent 的
+        # RunResult.exit_code 写进这里。后者只表示 pi 进程本身是否收尾。
+        command_exit_codes: dict[str, int] = {}
+        agent_exit_codes: dict[str, int] = {}
         durations: dict[str, int] = {}
+        diagnostics: dict[str, dict] = {}
         mgr = WorktreeManager(source_repo=repo, worktrees_dir=repo.parent / ".cognicode-wts")
 
         for cmd in commands:
-            t0 = time.time()
+            agent_code: int | None = None
+            agent_note = ""
             try:
-                with mgr.worktree() as wt:
-                    # 探测 = 让 agent 在 fresh worktree 里跑构建/测试
-                    result = self.executor.run(
-                        " ".join(cmd.command),
-                        worktree=wt,
-                        timeout_s=PROBE_TIMEOUT_S,
-                    )
-                    code = result.exit_code if result.ok else (result.exit_code or 1)
+                # Agent 和真实命令各用一个 pristine worktree。否则 Agent 可能
+                # 修改依赖/生成物，导致后面的命令码不再代表冷启动仓库。
+                with mgr.worktree() as agent_wt:
+                    # 先保留 Agent 的冷启动执行与进程级结果，作为诊断信息；
+                    # 但它不能代表 build/test 命令是否成功。
+                    try:
+                        result = self.executor.run(
+                            " ".join(cmd.command),
+                            worktree=agent_wt,
+                            timeout_s=PROBE_TIMEOUT_S,
+                        )
+                        agent_code = result.exit_code
+                        agent_note = result.outcome_note
+                    except Exception as exc:
+                        agent_code = 1
+                        agent_note = f"{type(exc).__name__}: {exc}"
+
+                with mgr.worktree() as command_wt:
+                    t0 = time.time()
+                    command_result = _run_probe_command(cmd.command, command_wt)
+                    duration_ms = int((time.time() - t0) * 1000)
+                    code = command_result["exit_code"]
+                    diagnostic = {
+                        "command": cmd.command,
+                        "exit_code": code,
+                        "duration_ms": duration_ms,
+                        "stdout_tail": command_result["stdout_tail"],
+                        "stderr_tail": command_result["stderr_tail"],
+                        "agent_exit_code": agent_code,
+                    }
+                    if command_result["error"]:
+                        diagnostic["error"] = command_result["error"]
             except WorktreeError as e:
                 notes.append(f"{cmd.name}: worktree 失败（{e}）")
                 code = -1
-            exit_codes[cmd.name] = code
-            durations[cmd.name] = int((time.time() - t0) * 1000)
+                duration_ms = 0
+                diagnostic = {
+                    "command": cmd.command,
+                    "exit_code": code,
+                    "duration_ms": duration_ms,
+                    "stdout_tail": "",
+                    "stderr_tail": "",
+                    "agent_exit_code": agent_code,
+                    "error": str(e),
+                }
 
-        success, reason = probe_success(exit_codes)
+            command_exit_codes[cmd.name] = code
+            durations[cmd.name] = duration_ms
+            if agent_code is not None:
+                agent_exit_codes[cmd.name] = agent_code
+            diagnostics[cmd.name] = diagnostic
+            if agent_code != 0:
+                notes.append(f"{cmd.name}: Agent 进程 exit {agent_code}（{agent_note or '未正常收尾'}）")
+            if code != 0:
+                notes.append(
+                    f"{cmd.name}: 命令 exit {code}（{diagnostic.get('stderr_tail') or diagnostic.get('stdout_tail') or '无诊断输出'}）"
+                )
+
+        success, reason = probe_success(command_exit_codes)
         notes.append(reason)
         return {
             "success": success,
             "degrade": not success,
-            "exit_codes": exit_codes,
+            # 保留旧键，修正其语义为真实命令退出码。
+            "exit_codes": command_exit_codes,
+            "command_exit_codes": command_exit_codes,
+            "agent_exit_codes": agent_exit_codes,
             "durations": durations,
+            "diagnostics": diagnostics,
             "notes": notes,
         }
 

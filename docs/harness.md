@@ -75,8 +75,13 @@ pi --mode rpc --model tencent-copilot/deepseek-v4-flash-ioa \
 - `locate_probe_commands(repo)`：定位仓库声明的构建/测试命令
   （composer.json / package.json / pyproject.toml / Makefile / 测试目录后备），
   纯确定性，无执行。
-- `ProbeRunner.run(repo)`：每条命令在 fresh worktree 里让 pi agent 执行，
-  记录 exit code 与耗时（探测超时 30 分钟，#6）。
+- `ProbeRunner.run(repo)`：每条命令先在 fresh worktree 里由 pi agent 冷启动，
+  再由 harness 直接执行同一条已定位命令，记录命令真实 exit code、耗时及
+  stdout/stderr 尾部诊断（探测超时 30 分钟，#6）。Agent 进程退出码只作诊断，
+  不参与成功判定。
+- 产物中的 `exit_codes`（兼容字段）和 `command_exit_codes` 都是命令真实退出码；
+  `agent_exit_codes` 单独保留 pi 进程退出码，避免 Agent 正常收尾掩盖测试失败。
+  命令超时记 `124`，可执行文件不存在记 `127`，其他启动错误记 `126`。
 - `probe_success(exit_codes)`：**「成功」= 至少一条构建 exit 0 且至少一条
   测试 exit 0**（地图 Notes 锁定）。无构建/无测试 → 失败（降级路径）。
 
