@@ -132,7 +132,8 @@ class TestPiExecutorEnv:
         assert env["HARNESS_READ_ONLY"] == "0"
 
     def test_build_cmd_no_bad_flag(self, exec_maker, tmp_path: Path):
-        """pi CLI 无 --max-turns；扩展用 -e 加载。"""
+        """pi CLI 无 --max-turns；存在的扩展用 -e 加载。"""
+        (tmp_path / "cognicode-harness-ext.ts").write_text("// fake extension", encoding="utf-8")
         ex = exec_maker(ext_dir=str(tmp_path))
         cmd = ex._build_cmd()
         assert "--max-turns" not in cmd  # 不传 pi 不认识的参数

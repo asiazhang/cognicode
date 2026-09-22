@@ -16,6 +16,7 @@ from cognicode.executor import RunResult, TaskStats
 from cognicode.harness import (
     ProbeRunner,
     WorktreeManager,
+    run_samples,
     run_task,
 )
 
@@ -115,6 +116,112 @@ class TestProbeRunner:
         result = runner.run(repo)
         assert result["success"] is False
         assert result["degrade"] is True  # 探测全灭 → 整体降级
+
+
+class MutatingExecutor:
+    """在当前 worktree 写入改动，用于验证采样隔离。"""
+
+    def __init__(self):
+        self.calls: list[Path] = []
+
+    def run(self, prompt: str, worktree: Path, *, timeout_s: int = 900,
+            trace_file: Path | None = None) -> RunResult:
+        self.calls.append(worktree)
+        (worktree / "hello.txt").write_text(prompt + "\\n", encoding="utf-8")
+        if trace_file:
+            trace_file.parent.mkdir(parents=True, exist_ok=True)
+            trace_file.write_text(json.dumps({"type": "agent_settled"}) + "\\n", encoding="utf-8")
+        return RunResult(ok=True, exit_code=0, outcome_note="settled",
+                         stats=TaskStats(settled=True))
+
+
+class CrashingExecutor:
+    """模拟外部 executor 进程崩溃（不是 harness 环境故障）。"""
+
+    def run(self, prompt: str, worktree: Path, *, timeout_s: int = 900,
+            trace_file: Path | None = None) -> RunResult:
+        raise RuntimeError("fake executor crashed")
+
+
+class TestRunSamples:
+    def test_samples_are_isolated_and_audited(self, git_repo: Path, tmp_path: Path):
+        """每个 sample 使用 fresh worktree，源仓库和审计产物均可复核。"""
+        source_before = (git_repo / "hello.txt").read_text(encoding="utf-8")
+        status_before = subprocess.run(
+            ["git", "-C", str(git_repo), "status", "--porcelain"],
+            check=True, capture_output=True, text=True,
+        ).stdout
+        ex = MutatingExecutor()
+        results = run_samples(
+            executor=ex,
+            worktree_mgr=WorktreeManager(git_repo, tmp_path / "wts"),
+            prompt="sample change",
+            task_id="task-1",
+            sample_count=2,
+            run_dir=tmp_path / "run",
+        )
+
+        assert len(results) == 2
+        assert len({p for p in ex.calls}) == 2
+        assert all(r.result is not None for r in results)
+        for r in results:
+            assert r.trace_file.exists()
+            assert r.diff_file.exists()
+            assert r.result_file.exists()
+            assert "task-1__sample-" in r.trace_file.name
+            assert "sample change" in r.diff_file.read_text(encoding="utf-8")
+            payload = json.loads(r.result_file.read_text(encoding="utf-8"))
+            assert payload["task_id"] == "task-1"
+            assert payload["sample_id"] == r.sample_id
+            assert payload["outcome_note"] == "settled"
+            assert payload["trace_file"] == str(r.trace_file)
+            assert payload["diff_file"] == str(r.diff_file)
+            assert payload["result_file"] == str(r.result_file)
+        assert not any((tmp_path / "wts").iterdir())
+        assert (git_repo / "hello.txt").read_text(encoding="utf-8") == source_before
+        status_after = subprocess.run(
+            ["git", "-C", str(git_repo), "status", "--porcelain"],
+            check=True, capture_output=True, text=True,
+        ).stdout
+        assert status_after == status_before == ""
+
+    def test_task_ids_cannot_escape_run_directory(self, git_repo: Path, tmp_path: Path):
+        """任意任务标识都只能生成 run_dir 内的审计文件。"""
+        results = run_samples(
+            MutatingExecutor(), WorktreeManager(git_repo, tmp_path / "safe-wts"),
+            "x", "../task/unsafe", 1, tmp_path / "safe-run",
+        )
+        sample = results[0]
+        assert sample.trace_file.parent == tmp_path / "safe-run" / "traces"
+        assert sample.diff_file.parent == tmp_path / "safe-run" / "diffs"
+        assert sample.result_file.parent == tmp_path / "safe-run" / "results"
+        assert sample.trace_file.resolve().is_relative_to((tmp_path / "safe-run").resolve())
+
+    def test_timeout_and_crash_are_task_results(self, git_repo: Path, tmp_path: Path):
+        """timeout 与 executor 崩溃都保留可定位的任务级结果，不污染源仓库。"""
+        ex = FakeExecutor([
+            RunResult(ok=False, exit_code=124, outcome_note="timeout"),
+        ])
+        timeout_result = run_samples(
+            ex, WorktreeManager(git_repo, tmp_path / "timeout-wts"), "x", "task-2",
+            1, tmp_path / "timeout-run",
+        )[0]
+        assert timeout_result.result is not None
+        assert timeout_result.result.outcome_note == "timeout"
+        assert json.loads(timeout_result.result_file.read_text())["exit_code"] == 124
+
+        crash_result = run_samples(
+            CrashingExecutor(), WorktreeManager(git_repo, tmp_path / "crash-wts"),
+            "x", "task-3", 1, tmp_path / "crash-run",
+        )[0]
+        assert crash_result.result is not None
+        assert crash_result.result.ok is False
+        assert crash_result.result.outcome_note == "crash"
+        assert "fake executor crashed" in crash_result.result.stderr_tail
+        assert "executor_crash" in crash_result.trace_file.read_text(encoding="utf-8")
+        crash_payload = json.loads(crash_result.result_file.read_text())
+        assert crash_payload["outcome_note"] == "crash"
+        assert crash_payload["outcome_category"] == "fail_env"
 
 
 class TestRunTask:

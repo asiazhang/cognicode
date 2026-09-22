@@ -21,7 +21,7 @@ harness = 动态测量的执行层：环境探测 + 合成任务执行 + 产物�
 | `pi_executor.py` | `PiExecutor`：pi 0.84.3 RPC 驱动 + 采集自算 + 测量隔离清单 |
 | `ext/cognicode-harness-ext.ts` | 测量隔离扩展（max-turns 早停 / 只读门 / submit_result） |
 | `probe.py` | 环境探测命令定位 + 成功判定（纯函数） |
-| `harness.py` | `WorktreeManager`（fresh worktree）+ `ProbeRunner` + `run_task` 编排 |
+| `harness.py` | `WorktreeManager`（fresh worktree）+ `ProbeRunner` + `run_task`/`run_samples` 编排 |
 
 ## 采集口径（pi-schema.md §7 归一化）
 
@@ -83,16 +83,30 @@ pi --mode rpc --model tencent-copilot/deepseek-v4-flash-ioa \
 nbnbk 实测：`test.phpunit: 0`（phpunit 真跑成功），但无构建命令
 （composer.json 无 scripts.build）→ 探测失败 → `degrade: true`。
 
-## 任务执行（harness.py run_task）
+## 任务执行（harness.py run_task / run_samples）
 
-每次任务：
+`run_task` 执行单次任务并收集持久产物：
 1. `WorktreeManager.worktree()`：fresh git worktree（clone 被测仓库，独立隔离）
 2. `executor.run(prompt, worktree, timeout_s, trace_file)`：pi RPC 执行
    （外层 timeout 包裹，任务超时 15 分钟，#6）
-3. harness 侧 `git diff HEAD` 收产物（落 `.cognicode/<run-id>/diffs/<task>.diff`）
-4. 全量事件轨迹落 `.cognicode/<run-id>/traces/<task>.jsonl`
+3. harness 侧收集已跟踪和未跟踪改动的 diff
+4. 全量事件轨迹落盘；executor 崩溃也写入 `executor_crash` 轨迹
 
-worktree 创建失败 → `run_task` 返回 None（fail_env 信号）。
+`run_samples` 是固定采样次数 `k` 的任务级编排。每次采样使用新的 worktree，
+并使用 `task-id__sample-N` 作为文件键，因此同一任务的 trace、diff 和结果可以
+按 `task_id` + `sample_id` 定位。运行目录保留审计产物，worktree 在 `run_task`
+返回后清理：
+
+```
+.cognicode/<run-id>/
+├── traces/<task-id>__sample-N.jsonl
+├── diffs/<task-id>__sample-N.diff
+└── results/<task-id>__sample-N.json
+```
+
+`results/*.json` 保存 `ok`、退出码、结局说明、统计和 task/sample 标识。
+超时（通常 exit 124）和 executor 崩溃是任务结果，不会中止其余采样；worktree
+创建失败仍返回 `None`，作为 `fail_env` 信号。
 
 ## CLI
 

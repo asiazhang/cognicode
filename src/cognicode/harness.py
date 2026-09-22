@@ -14,15 +14,18 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import re
 import shutil
 import subprocess
 import time
+import uuid
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 
-from cognicode.executor import Executor, RunResult
+from cognicode.executor import Executor, RunResult, TaskStats
 from cognicode.probe import locate_probe_commands, probe_success
 
 # 探测超时（#6 锁定：探测 30 分钟）
@@ -63,7 +66,8 @@ class WorktreeManager:
                 f"源仓库 {self.source_repo} 不是 git 仓库（无 .git）"
             )
         self.worktrees_dir.mkdir(parents=True, exist_ok=True)
-        wt_dir = self.worktrees_dir / f"wt-{int(time.time() * 1000)}"
+        # UUID 避免快速连续采样在同一毫秒复用目录。
+        wt_dir = self.worktrees_dir / f"wt-{uuid.uuid4().hex}"
         try:
             subprocess.run(
                 ["git", "clone", "-q", "--no-hardlinks", str(self.source_repo), str(wt_dir)],
@@ -127,6 +131,22 @@ class ProbeRunner:
         }
 
 
+@dataclass(frozen=True)
+class SampleResult:
+    """一次任务采样的可审计结果及其产物位置。
+
+    ``sample_id`` 是全局运行目录内的定位键；所有路径都指向运行目录下的
+    持久产物，worktree 本身不属于审计产物，采样结束后会被删除。
+    """
+
+    task_id: str
+    sample_id: str
+    result: RunResult | None
+    trace_file: Path
+    diff_file: Path
+    result_file: Path
+
+
 def run_task(
     executor: Executor,
     worktree_mgr: WorktreeManager,
@@ -154,25 +174,188 @@ def run_task(
 
     try:
         with worktree_mgr.worktree() as wt:
-            result = executor.run(
-                prompt, worktree=wt, timeout_s=timeout_s, trace_file=trace_file,
-            )
-            # 收产物：harness 侧 git diff（fresh worktree 的改动）
             try:
-                diff = subprocess.run(
-                    ["git", "-C", str(wt), "diff", "HEAD"],
+                result = executor.run(
+                    prompt, worktree=wt, timeout_s=timeout_s, trace_file=trace_file,
+                )
+            except Exception as exc:
+                # 外部 executor 崩溃是一次可观测的任务结果，不应让整个采样
+                # 中断；结果 JSON 会将其标记为 fail_env，避免计入有效样本。
+                result = RunResult(
+                    ok=False,
+                    exit_code=1,
+                    trace_file=trace_file,
+                    stderr_tail=f"{type(exc).__name__}: {exc}",
+                    outcome_note="crash",
+                )
+                trace_file.parent.mkdir(parents=True, exist_ok=True)
+                _append_trace_event(trace_file, {
+                    "type": "executor_crash",
+                    "error": result.stderr_tail,
+                })
+
+            # 统一由 harness 决定产物路径，避免 executor 返回的路径破坏
+            # task/sample 定位契约。
+            if not trace_file.exists():
+                trace_file.parent.mkdir(parents=True, exist_ok=True)
+                trace_file.touch()
+
+            # 收产物：harness 侧 git diff（fresh worktree 的改动）。即使
+            # diff 命令失败，也保留空 diff 文件，保证目录契约稳定。
+            diff_text, diff_error = _collect_diff(wt)
+            diff_file.parent.mkdir(parents=True, exist_ok=True)
+            diff_file.write_text(diff_text, encoding="utf-8")
+            if diff_error:
+                result = replace(
+                    result,
+                    stderr_tail=(result.stderr_tail + "\n" + diff_error).strip(),
+                    outcome_note=result.outcome_note or "artifact_error",
+                )
+            return replace(
+                result,
+                trace_file=trace_file,
+                diff=diff_text,
+            )
+    except WorktreeError:
+        return None
+
+
+def _append_trace_event(trace_file: Path, event: dict) -> None:
+    """追加 harness 事件，不覆盖 executor 已经写入的 trace。"""
+    trace_file.parent.mkdir(parents=True, exist_ok=True)
+    with trace_file.open("a", encoding="utf-8") as stream:
+        stream.write(json.dumps(event, ensure_ascii=False) + "\n")
+
+
+def _collect_diff(worktree: Path) -> tuple[str, str | None]:
+    """收集已跟踪与未跟踪改动，避免新建测试文件从 diff 中消失。"""
+    try:
+        tracked_result = subprocess.run(
+            ["git", "-C", str(worktree), "diff", "HEAD"],
+            capture_output=True, text=True, timeout=30,
+        )
+        if tracked_result.returncode != 0:
+            return "", f"diff collection failed: {tracked_result.stderr[-500:]}"
+        untracked_result = subprocess.run(
+            ["git", "-C", str(worktree), "ls-files", "--others", "--exclude-standard"],
+            capture_output=True, text=True, timeout=30,
+        )
+        if untracked_result.returncode != 0:
+            return "", f"untracked file listing failed: {untracked_result.stderr[-500:]}"
+        parts = [tracked_result.stdout]
+        for name in untracked_result.stdout.splitlines():
+            path = worktree / name
+            if path.is_file():
+                extra = subprocess.run(
+                    ["git", "diff", "--no-index", "--", "/dev/null", str(path)],
                     capture_output=True, text=True, timeout=30,
                 )
-                result = RunResult(
-                    ok=result.ok, exit_code=result.exit_code,
-                    trace_file=result.trace_file, diff=diff.stdout,
-                    stats=result.stats, stderr_tail=result.stderr_tail,
-                    outcome_note=result.outcome_note,
-                )
-                diff_file.parent.mkdir(parents=True, exist_ok=True)
-                diff_file.write_text(diff.stdout, encoding="utf-8")
-            except Exception:
-                pass
-            return result
-    except WorktreeError as e:
-        return None
+                # git diff --no-index 用 1 表示「有差异」，这仍是成功收集。
+                if extra.returncode not in (0, 1):
+                    return "", f"untracked diff failed for {name}: {extra.stderr[-500:]}"
+                if extra.stdout:
+                    parts.append(extra.stdout)
+        return "".join(parts), None
+    except Exception as exc:
+        return "", f"diff collection failed: {type(exc).__name__}: {exc}"
+
+
+def _result_payload(task_id: str, sample_id: str, result: RunResult | None) -> dict:
+    """把任务级结果编码成稳定、无 Path 对象的 JSON 审计记录。"""
+    if result is None:
+        return {
+            "task_id": task_id,
+            "sample_id": sample_id,
+            "ok": False,
+            "exit_code": None,
+            "outcome_note": "worktree_error",
+            "outcome_category": "fail_env",
+            "trace_file": None,
+            "diff_file": None,
+            "result_file": None,
+            "stats": asdict(result.stats) if result else asdict(TaskStats()),
+        }
+    payload = asdict(result)
+    payload["trace_file"] = str(result.trace_file) if result.trace_file else None
+    payload["stats"] = asdict(result.stats)
+    payload["outcome_category"] = _execution_category(result)
+    payload.update({"task_id": task_id, "sample_id": sample_id})
+    return payload
+
+
+def _execution_category(result: RunResult) -> str | None:
+    """映射可观测的 executor 状态；最终判卷仍由 harness 负责。"""
+    if result.outcome_note in {"crash", "artifact_error"}:
+        return "fail_env"
+    if result.outcome_note == "timeout" or result.exit_code == 124:
+        return "fail_budget"
+    return None
+
+
+def _artifact_id(task_id: str, sample_number: int) -> str:
+    """将任务标识编码为 run_dir 内安全且稳定的文件键。"""
+    safe = re.sub(r"[^A-Za-z0-9_.-]+", "_", task_id).strip("._") or "task"
+    if safe != task_id or ".." in task_id:
+        digest = hashlib.sha256(task_id.encode("utf-8")).hexdigest()[:12]
+        safe = f"{safe}-{digest}"
+    return f"{safe}__sample-{sample_number}"
+
+
+def run_samples(
+    executor: Executor,
+    worktree_mgr: WorktreeManager,
+    prompt: str,
+    task_id: str,
+    sample_count: int,
+    run_dir: Path,
+    timeout_s: int = TASK_TIMEOUT_S,
+) -> list[SampleResult]:
+    """独立重复执行一个合成任务，并保留每个 sample 的运行产物。
+
+    每次循环都创建新的 fresh worktree；``run_task`` 返回后 worktree 已清理，
+    但 ``traces/``, ``diffs/`` 和 ``results/`` 下的审计文件继续保留。
+    """
+    if sample_count < 1:
+        raise ValueError("sample_count 必须至少为 1")
+
+    results: list[SampleResult] = []
+    for index in range(1, sample_count + 1):
+        sample_id = f"{task_id}/sample-{index}"
+        artifact_id = _artifact_id(task_id, index)
+        result = run_task(
+            executor=executor,
+            worktree_mgr=worktree_mgr,
+            prompt=prompt,
+            task_id=artifact_id,
+            run_dir=run_dir,
+            timeout_s=timeout_s,
+        )
+        trace_file = run_dir / "traces" / f"{artifact_id}.jsonl"
+        diff_file = run_dir / "diffs" / f"{artifact_id}.diff"
+        result_file = run_dir / "results" / f"{artifact_id}.json"
+        # 即使 worktree 创建失败，也为该 sample 保留稳定的 trace/diff
+        # 占位文件；结果 JSON 会明确记录 worktree_error。
+        trace_file.parent.mkdir(parents=True, exist_ok=True)
+        diff_file.parent.mkdir(parents=True, exist_ok=True)
+        trace_file.touch(exist_ok=True)
+        diff_file.touch(exist_ok=True)
+        result_file.parent.mkdir(parents=True, exist_ok=True)
+        payload = _result_payload(task_id, sample_id, result)
+        payload.update({
+            "trace_file": str(trace_file),
+            "diff_file": str(diff_file),
+            "result_file": str(result_file),
+        })
+        result_file.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2, default=str) + "\n",
+            encoding="utf-8",
+        )
+        results.append(SampleResult(
+            task_id=task_id,
+            sample_id=sample_id,
+            result=result,
+            trace_file=trace_file,
+            diff_file=diff_file,
+            result_file=result_file,
+        ))
+    return results
