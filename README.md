@@ -115,7 +115,9 @@ scripts/smoke_e2e.py    # 端到端冒烟脚本
 - [`docs/harness.md`](docs/harness.md) — 动态测量执行层与测量隔离
 - [`docs/task-generation.md`](docs/task-generation.md) — 三段式任务生成管线
 - [`docs/attribution.md`](docs/attribution.md) — 归因管线
-- [`docs/calibration/`](docs/calibration/) — 校准与语料方向预期
+- [`docs/smoke-e2e.md`](docs/smoke-e2e.md) — 端到端冒烟：done 标准与产出物清单
+- [`docs/calibration/pilot-corpus.md`](docs/calibration/pilot-corpus.md) — 试点校准仓库集（pin 到具体 commit）
+- [`docs/research/`](docs/research/) — 前置调研（pi headless schema、agent 驱动实测、同类工具对标）
 
 ## 状态
 
