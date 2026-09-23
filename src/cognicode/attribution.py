@@ -39,9 +39,30 @@ from __future__ import annotations
 import json
 import re
 
-from cognicode.score import DIMENSION_LABELS_ZH, DIMENSIONS
 from cognicode.static_signals import SIGNAL_NAMES
-from cognicode.verdict import is_counted
+
+# 六维度失败模式语言（分类轴，原 score.py 常量随评分形态废弃，语言内联回归）
+DIMENSIONS = (
+    "solvability",
+    "safety",
+    "efficiency",
+    "navigability",
+    "buildability",
+    "diagnosability",
+)
+DIMENSION_LABELS_ZH = {
+    "solvability": "可解性",
+    "safety": "变更安全性",
+    "efficiency": "效率",
+    "navigability": "可导航性",
+    "buildability": "环境可用性",
+    "diagnosability": "可诊断性",
+}
+
+
+def is_counted(category: str) -> bool:
+    """该任务类别是否计入统计（前三类计，fail_env 剔除；原 verdict.py 内联）。"""
+    return category in {"success", "fail_incorrect", "fail_budget"}
 
 # 任务类别 → 维度（#15 §1：任务类型即维度）
 _KIND_TO_DIM = {

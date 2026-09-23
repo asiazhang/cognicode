@@ -12,7 +12,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-from cognicode.score import WEIGHT_VERSION
+WEIGHT_VERSION = "equal-1of6-v1"  # 原住 score.py，评分形态废弃后 schema 兼容标记仍需版本号
 
 # 当前报告 schema 版本。主版本 = 分数结构兼容性；次版本 = 呈现/字段增补。
 REPORT_SCHEMA_VERSION = "1.0"

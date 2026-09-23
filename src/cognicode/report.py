@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from cognicode.score import DIMENSIONS, DIMENSION_LABELS_ZH
+from cognicode.attribution import DIMENSIONS, DIMENSION_LABELS_ZH
 
 # 建议模板：产分信号名 → (中文建议文本, 预期方向)。
 # #7 #6/#15 #2-1：产分信号缺失/低档 → 确定性模板，锚定该信号。
