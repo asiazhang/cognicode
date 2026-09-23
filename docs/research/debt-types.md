@@ -32,6 +32,8 @@
 
 A 族判据细则已由 [#49](https://github.com/asiazhang/cognicode/issues/49) 落定：唯一真值升为全方法论判断原则（见 CONTEXT.md 术语表）；dead-code 留册不覆盖；duplicate-code 两档分工（工具集成 + LLM 语义重复）；naming-debt 预排降为低。实例打分维度：duplicate-code 按分叉状态 > 副本距离 > 语义≥文本 > 副本数 > 变化频率，naming-debt 一维（检索误导程度）；多债并存时多 slug 并挂。
 
+补充（同票第二轮）：实例粒度 = 重复簇（N 份副本一个实例，簇内指定权威副本，修复建议挂「其余向权威合并」）；测试代码与产品代码同等优先级（重复重灾区——agent 写测试无法复用样板、token 成本极高，为 duplicate-code 补效率维度痛感机制）；确定性档排除 vendored 目录与生成文件（@generated 标记），语义档全仓扫；语言惯用样板由 LLM 语义档标注降级，不做白名单；naming-debt 语言惯例符号跳过、文件名与符号名同权。
+
 ### B 测试债
 
 | slug | 名称 | 失败模式归属 | 严重度机制 | 预排 | 检测档 |
