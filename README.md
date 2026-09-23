@@ -88,6 +88,11 @@ src/cognicode/
 └── cli.py              # 静态提取壳（待 #42 定夺）
 tests/                  # pytest 测试套件
 docs/                   # ADR / 调研 / 域文档
+cognicode-debt/
+├── SKILL.md            # （待建）skill 编排协议
+└── criteria/           # 判据：分族子代理作业指令
+    ├── A-structural.md … G-architecture-shape.md   # 七族判据（F 并入 E）
+    └── rules/          # 17 类型逐规则详解（人类向，含正反例，供讨论）
 ```
 
 ## 文档
@@ -98,6 +103,8 @@ docs/                   # ADR / 调研 / 域文档
 - [`docs/research/debt-taxonomy.md`](docs/research/debt-taxonomy.md) — 业界技术债既有谱系调研
 - [`docs/research/ai-dev-pain-points-synthesis.md`](docs/research/ai-dev-pain-points-synthesis.md) — AI 开发时代痛点全景（双模型交叉验证综合结论）
 - [`docs/research/asset-inventory.md`](docs/research/asset-inventory.md) — 既有资产盘点：哪些代码可复用为债检测
+- [`cognicode-debt/criteria/`](cognicode-debt/criteria/) — 分族判据：A–G 七族子代理作业指令
+- [`cognicode-debt/criteria/rules/`](cognicode-debt/criteria/rules/) — **逐规则详解（含实例）**：17 个债类型每条规则一份文档，正例带 agent 失败形态与预期报告行、反例讲清不报边界，「讨论要点」节留给评审
 - [`docs/adr/`](docs/adr/) — 架构决策记录
 - [`docs/agents/`](docs/agents/) — agent 工作约定（issue 跟踪、triage、域文档）
 
