@@ -1,31 +1,44 @@
 # CogniCode
 
-> 仓库级 AI 原生程度评估与打分工具。
+> 仓库级 **AI 技术债**识别与展示工具（转型中）。
 
-CogniCode 用**合成基准任务驱动真实编程 agent 执行**，动态测量一个代码仓库对 AI 的友好程度——不是靠规则打分，而是让 agent 真刀真枪地在仓库上「找代码 / 跑环境 / 查问题 / 改代码」，从执行结果与过程信号中取值。
+AI 编程 agent 正在成为代码的主要作者之一，一种新的债随之积累：**对 AI 不友好的债**——会让下一个 agent 迷路、犯错或返工的仓库状态，比如没人外化的隐式约定、改 A 必须改 B 但代码里看不出来的耦合、跑不起来的验证回路、主动误导人的过时文档。这种债的利息由 agent 支付（多花 token、改错地方、部分重构留下不一致），但既有工具全部以人类维护成本为判据，没有谁测量它。
 
-## 要解决什么问题
+CogniCode 正在从「AI 原生程度打分工具」转型为这个空档的填补者：**扫描一个仓库，产出按严重度排序的债项清单**——每项标注位置、类型、为什么是债、修复建议，落盘为仓库内 `DEBT.md`，可 diff、可追债的增减。
 
-AI 编程 agent 正在成为代码的主要作者之一，仓库质量的评判标准随之改变：决定开发效率的不再只是「人读起来顺不顺手」，还有 **agent 能不能在里面找对代码、跑起验证回路、改完不炸别处**。但目前：
+## 为什么是现在
 
-- **没有可信的测量手段**：现有「AI 友好度」工具（DAF 等）全是静态打分——数文件、查配置、按拍脑袋的权重加总，无实证校准。分数回答不了「agent 在这个仓库上到底能不能干活」（调研见 [`docs/research/prior-art.md`](docs/research/prior-art.md)）。
-- **改进无法归因**：个人开发者想让仓库更适配 AI——补了 README、修了构建、理了模块——但改完之后是变好了还是没变？没有基线和可重测的锚点，改造只能靠信仰。
-- **明星仓库的结论迁移不过来**：真实目标场景是「真实写过但未精修」的脏乱遗留仓库，语言混杂、基建残缺，恰好是现有评测覆盖不到的中低端区间。
+（调研证据见 [`docs/research/ai-dev-pain-points-synthesis.md`](docs/research/ai-dev-pain-points-synthesis.md)）
 
-## 面临的困难
+- **体量**：AI 已占已提交代码的 42%（Sonar 2026），Google 报告 75% 的新代码由 AI 生成。
+- **痛感已被决策层确认**：55% 的工程负责人把「代码库理解」列为头号担忧，且多数承认在 code review 之外没有应对手段（Augment 2026）。
+- **既有解法被证伪**：AI 审 AI 的建议拒收率 56%（31,073 条实证）；AGENTS.md 在通用开源库上边际甚至负收益（ETH Zurich）。
+- **空档双向印证**：学术界的债分类体系（Li–Avgeriou–Liang、SQALE、CodeScene）全部以人类为利息受损者，无一以 agent 表现为判据；从业者侧的痛点恰好大量落在「会让下一个 agent 迷路」的仓库属性上。
 
-这些困难也是本项目的方法学核心（决策记录见 [issue #1 地图](https://github.com/asiazhang/cognicode/issues/1)）：
+## 方法学
 
-1. **路线是空白区**：调研结论——未发现任何「用真实 agent 执行合成任务来动态测量仓库 AI 友好度」的公开工作。没有现成方法可抄，测量协议要从零立。
-2. **跨语言合成任务是公认未解问题**：SWE-smith 只支持 Python，Multi-SWE-bench 靠 68 名标注者重人力标注。CogniCode 要求任意语言通用，只能走 tree-sitter 语言无关符号提取，把语言成本压到任务模板层。
-3. **分数必须稳定，但 agent 天生随机**：改进无法归因则建议无意义，分数稳定是硬需求。对策：固定采样次数 k + 区间估计、执行者配置逐项钉死、随分发布运行环境快照（缺快照的分数不可比较）。
-4. **任务本身可能是坏的**：合成任务若不可解，测出来的全是噪声。对策：执行式验证过滤——F2P/P2P 双闸过不了当场砍掉；判卷权只属于 harness 侧客观判定（位置匹配/测试红绿/退出码），不信 agent 自评。
-5. **没有 ground truth，权重不能拟合**：试点语料只有 5 席位，拟合权重必过拟合。对策：首发等权 1/6 + 每次打分附权重敏感性分析；方向悖离则回修测量而非调权重。
-6. **静态打分的前车之鉴**：DAF 等工具的维度划分可参考，但「无实证权重」正是它们的方法学弱点。本项目用动静双测量互为校验，动态为主体（≥70%）、静态为修正项。
+### 债的定义
 
-## 六个维度
+**对 AI 不友好的债** = 会让下一个 AI agent 在这个仓库里迷路 / 犯错 / 爆炸的仓库状态。判据主体是 agent 的表现，不归因谁写的代码——人类视角的零利息债（如死代码）在这里可能利息很高，反之亦然。
 
-「AI 原生程度（AI-native readiness）」由六个概念维度聚合度量，每个维度对应一种独立的失败模式：
+### 判别法则（调研收敛，详见 synthesis 文档）
+
+1. **换主体测试**：把受损方从「人类维护者」换成「下一个 agent」，痛感是否仍然成立且可观测？
+2. **产物 vs 判据**：社会债的产物（文档、规范）恰是 agent 导航所依赖的，但其判据（人员分布、知识流失）与 agent 无关——只取产物、不取判据。
+3. **产出缺陷 ≠ 仓库债**：AI 生成了带 bug 的代码说明生成质量问题；换更强的模型重跑同一任务，痛感不消失才是仓库债。
+
+### 债分类学（20 类型，7 个工件族）
+
+沿六维度失败模式做类型轴，双层结构：失败模式做判断轴、债类型（slug）做检测与报告单元、工件族做展示标签。完整清单见 [`docs/research/debt-types.md`](docs/research/debt-types.md)。
+
+### 检测分两档
+
+- **确定性发现**：可复现的静态提取与工具集成（tree-sitter 符号分析、重复检测、文档漂移对照），同一仓库永远得出同一结果。
+- **LLM 推断发现**：语义级判断（如「仅凭名字能否预测这个符号做什么」），标注置信度。
+
+### 六维度语言
+
+转型不是推翻而是重定位：原有的六维度失败模式语言降级为债识别的信号引擎——
 
 | 维度 | 失败模式 |
 |---|---|
@@ -36,111 +49,61 @@ AI 编程 agent 正在成为代码的主要作者之一，仓库质量的评判�
 | **环境可用性**（buildability） | 跑不起验证回路 |
 | **可诊断性**（diagnosability） | 定位不了失败 |
 
-## 工作原理
+### 唯一真值原则
 
-### 双测量（dual measurement）
+同一知识在仓库中应只存在一份权威版本；存在多份且未声明哪份权威，即构成债形态。这是横贯多个债类型的判断原则（重复代码、文档腐烂、配置漂移、隐式契约）。
 
-同一维度同时由两条独立链路观测，动静互为校验：
+## 交付形态（转型目标）
 
-- **动态测量**：让真实编程 agent 在仓库上执行合成基准任务，从执行结果与过程信号取值。
-- **静态测量**：不经执行，直接从仓库文件与结构中提取信号。分两档——**产分信号**（进入维度分，全部语言无关、可确定性提取）与**归因信号**（解释失败、驱动建议，如模块深度判定）。
+- **载体 = skill 集合**：`SKILL.md` 管 LLM 推断档与报告组织，内嵌确定性分析脚本管可复现提取；skill 仓库本身是分发单元，CLI 降为脚本副产品。
+- **报告 = 仓库内 `DEBT.md`**：按严重度排序的债项清单，可 diff、可追债的增减，兼作二次运行对比基准。
+- **首发受众**：个人开发者为主（agent 迷路、跨文件失手），团队负责人为辅（review 负担、质量滑坡）——两端痛点不同但指向同一批债项。
+- **动态测量**（跑真实 agent 验证债项的实际伤害）为二期实证校验，首发不含。
 
-### 任务生成三段式
+## 当前状态
 
-1. **符号提取**：tree-sitter 从源码提取命名符号（函数/方法/类），语言无关、确定性，产出符号级验收对照（`file::name`）。
-2. **LLM 模板合成**：生成三类任务——检索（语义→位置）、定位（症状→根因）、修改/修复（描述→改动），以及零合成的**环境探测**（冷启动跑起构建与测试）。生成配置独立钉死，`--offline` 时降级为确定性模板。
-3. **执行式验证过滤**：生成的任务必须过 harness 侧客观判定（位置匹配 / 测试红绿 / 退出码）才保留，无效实例当场砍掉。
+转型进行中（v0.2.0-dev）。已完成：债分类学（20 类型）、痛点与空档调研、资产盘点与仓库清理；进行中：skill 集合结构设计（[#42](https://github.com/asiazhang/cognicode/issues/42)）、DEBT.md 样例（[#43](https://github.com/asiazhang/cognicode/issues/43)）、重定位决策文档（[#44](https://github.com/asiazhang/cognicode/issues/44)）。规划与决策索引见 [wayfinder 地图 #39](https://github.com/asiazhang/cognicode/issues/39)。
 
-### 判卷与聚合
-
-- **判卷权只属于 harness**：F2P（改动前失败、改动后通过）与 P2P（前后都须通过）双闸判定，agent 的自报告只约定交卷格式、不参与判定。
-- **结果类别**五类互斥：`success` / `fail_incorrect` / `fail_budget` / `fail_env`，前三类计入统计，`fail_env` 剔除并重跑。
-- **采样次数 k 固定**，agent 的随机性由重复采样与区间估计消化，不依赖温度控制。
-- **权重敏感性分析**：每次打分随报告输出确定性网格扰动 + Dirichlet 采样，判定总分带宽与排序稳定性。
-
-### 报告
-
-本地 CLI 输出两层：终端打印「总览 → 维度明细 → 建议清单」一屏摘要，全量落盘 `cognicode-report.md`（信号明细、失败任务证据、运行环境快照、敏感性输出）。每条改进建议附**可重测声明**：锚定信号 + 预期方向 + 重跑同一套任务可验证。
-
-跨仓库排序仅作**软横比**参考，不做硬承诺；缺少运行环境快照的分数不可比较。
-
-## 安装
-
-要求 Python ≥ 3.11，推荐 [uv](https://docs.astral.sh/uv/)：
+现存 CLI 为重定位清理后的静态提取壳（`cognicode scan <repo>`，tree-sitter 符号提取 + 静态信号），最终形态待 skill 结构票定夺：
 
 ```bash
 git clone https://github.com/asiazhang/cognicode.git
 cd cognicode
 uv sync --extra dev
-```
-
-## 使用
-
-```bash
-# 对一个仓库跑完整评估
-cognicode scan <repo>
-
-# 确定性链路：LLM 全关（仅静态提取 + 探测）
-cognicode scan --offline <repo>
-
-# 从运行目录生成报告
-cognicode report <run-id>
-
-# 版本（含 report-schema 版本号）
-cognicode --version
-```
-
-每次运行的产物落在 `.cognicode/<run-id>/`（static.json、probe.json、tasks.json、verdicts.json、aggregate.json、snapshot.json、`cognicode-report.md` 等）。
-
-端到端冒烟：
-
-```bash
-uv run python scripts/smoke_e2e.py --offline        # 确定性链路
-uv run python scripts/smoke_e2e.py --live           # 开 LLM（归因兜底 + 模块深度）
-uv run python scripts/smoke_e2e.py --offline --tasks 2   # 减量验证
+cognicode scan <repo>          # 静态信号提取（复用线）
 ```
 
 ## 项目结构
 
 ```
 src/cognicode/
-├── symbols.py          # 三段式第一段：tree-sitter 符号提取
-├── generation.py       # 第二段：LLM / 确定性模板合成任务
-├── verify.py           # 第三段：执行式验证过滤
-├── pipeline.py         # 三段式整合
-├── probe.py            # 环境探测命令定位与成功判定
-├── harness.py          # fresh worktree + 探测/任务执行编排
-├── executor.py         # Executor 协议 + RunResult/TaskStats
-├── pi_executor.py      # pi headless RPC 驱动（唯一 executor 实现）
-├── verdict.py          # 判卷（F2P/P2P、位置匹配、五类 outcome）
-├── static_signals.py   # 静态产分/归因信号提取
-├── aggregate.py        # 六维聚合
-├── attribution.py      # 归因管线（确定性优先、LLM 兜底）
-├── module_depth.py     # 模块深度（参考性归因信号，不进产分）
-├── sensitivity.py      # 权重敏感性分析
-├── report.py           # 终端摘要 + cognicode-report.md
-├── schema.py           # report-schema 版本与报告结构
-└── cli.py              # 薄 CLI 壳
+├── symbols.py          # tree-sitter 符号提取（复用线）
+├── static_signals.py   # 静态信号提取（复用线）
+├── module_depth.py     # 模块深度判定（LLM 归因信号，复用线）
+├── probe.py            # 环境探测命令定位（复用线）
+├── attribution.py      # 归因管线（复用线）
+├── llm.py              # LLM 调用封装
+├── report.py           # 报告组织
+├── schema.py           # 版本与结构
+└── cli.py              # 静态提取壳（待 #42 定夺）
 tests/                  # pytest 测试套件
-docs/                   # harness / 任务生成 / 校准 / ADR / 前置研究
-prototype/              # pi 扩展原型（findings 与 RPC 驱动）
-scripts/smoke_e2e.py    # 端到端冒烟脚本
+docs/                   # ADR / 调研 / 域文档
 ```
 
 ## 文档
 
-- [`CONTEXT.md`](CONTEXT.md) — 领域词汇表与评分模型（术语的唯一权威定义）
-- [`docs/adr/`](docs/adr/) — 架构决策记录（静态信号进分、判卷权、executor 选型等）
-- [`docs/harness.md`](docs/harness.md) — 动态测量执行层与测量隔离
-- [`docs/task-generation.md`](docs/task-generation.md) — 三段式任务生成管线
-- [`docs/attribution.md`](docs/attribution.md) — 归因管线
-- [`docs/smoke-e2e.md`](docs/smoke-e2e.md) — 端到端冒烟：done 标准与产出物清单
-- [`docs/calibration/pilot-corpus.md`](docs/calibration/pilot-corpus.md) — 试点校准仓库集（pin 到具体 commit）
-- [`docs/research/`](docs/research/) — 前置调研（pi headless schema、agent 驱动实测、同类工具对标）
+- [`CONTEXT.md`](CONTEXT.md) — 领域词汇表（术语的唯一权威定义）
+- [`docs/research/debt-types.md`](docs/research/debt-types.md) — 债分类学：20 类型清单
+- [`docs/research/debt-candidates.md`](docs/research/debt-candidates.md) — 广义债候选观点集
+- [`docs/research/debt-taxonomy.md`](docs/research/debt-taxonomy.md) — 业界技术债既有谱系调研
+- [`docs/research/ai-dev-pain-points-synthesis.md`](docs/research/ai-dev-pain-points-synthesis.md) — AI 开发时代痛点全景（双模型交叉验证综合结论）
+- [`docs/research/asset-inventory.md`](docs/research/asset-inventory.md) — 既有资产盘点：哪些代码可复用为债检测
+- [`docs/adr/`](docs/adr/) — 架构决策记录
+- [`docs/agents/`](docs/agents/) — agent 工作约定（issue 跟踪、triage、域文档）
 
 ## 状态
 
-早期阶段（v0.1.0），MVP 闭环已在试点语料上冒烟验证。issue 跟踪见 [GitHub Issues](https://github.com/asiazhang/cognicode/issues)。
+转型中。决策流程走 [wayfinder 地图 #39](https://github.com/asiazhang/cognicode/issues/39)，issue 跟踪见 [GitHub Issues](https://github.com/asiazhang/cognicode/issues)。
 
 ## License
 
