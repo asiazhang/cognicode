@@ -3,6 +3,7 @@
 > Part of [Wayfinder 地图 #39](https://github.com/asiazhang/cognicode/issues/39) · 来源：[#53](https://github.com/asiazhang/cognicode/issues/53) 判据细则 + [#40](https://github.com/asiazhang/cognicode/issues/40) 类型清单 + [debt-types.md](../../docs/research/debt-types.md)
 > 本文件是 E 族（含原 F 族独立内容）分族子代理的完整作业指令。跨族共享约定（证据包 16K 预算、回传 JSON schema、严重度带定档流程）见 [SKILL.md](../SKILL.md)，此处不重复。
 
+> 逐类型人类向详解（含实例）见 [rules/](rules/)：build-entry-unclear · monolith-file · implicit-contract · fidelity-debt
 ## 0. 族概览与 F 族归位
 
 原 F 族（版本控制债）独立内容不足：`zombie-branch` 已出册（#40）、`vendored-dep` 留册一行带过（下文第 5 节），按 #42「留册类型族内一行带过」精神并入本文件，不单独成文。

@@ -3,6 +3,7 @@
 > Part of [Wayfinder 地图 #39](https://github.com/asiazhang/cognicode/issues/39) · 来源：[#49](https://github.com/asiazhang/cognicode/issues/49) 判据细则 + [#40](https://github.com/asiazhang/cognicode/issues/40) 类型清单 + [debt-types.md](../../docs/research/debt-types.md)
 > 本文件是 A 族分族子代理的完整作业指令。跨族共享约定（证据包 16K 预算、回传 JSON schema、严重度带定档流程）见 [SKILL.md](../SKILL.md)，此处不重复。
 
+> 逐类型人类向详解（含实例）见 [rules/](rules/)：duplicate-code · naming-debt
 ## 0. 族概览
 
 | slug | 名称 | 覆盖 | 检测档 | rubric 主轴 | 预排 |
