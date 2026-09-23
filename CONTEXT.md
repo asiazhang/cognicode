@@ -50,6 +50,10 @@ _Avoid_: 把风险信号当确证信号报告（断言质量等 LLM 推断必须
 一趟「测试→源」扫描产出的 per-test-file 结构化记录（测试函数计数、skip 标记、断言形态统计、import 私有符号清单、mock 目标清单），作为 test-rot / flaky-test / test-shape 的共享中间层。
 _Avoid_: 三类型各自独立扫描（重复工作且口径漂移）
 
+**module-graph 中间产物（module-graph artifact）**:
+G 族架构形状债的共享检测底座（#54）：模块清单 + 模块间调用计数 + 每模块公开/私有符号数，由 symbols.py 既有资产产出（确定性、零 LLM 成本）。模块粒度粗计数，不做调用图全图。shallow-module 的薄壳事实、misplaced-seam 的 seam 泄漏、hypothetical-seam 的实现计数都从它出发。
+_Avoid_: 把它做成调用图全图（重语言相关重活，违反「token 表是工程边界」先例）；为三类型各建独立模块清单（重复工作且口径漂移）
+
 **变异校准（mutation calibration）**:
 test-rot 断言质量层的证据结构：理论基准 = 变异性测试（被测行为出错时测试会变红吗的可执行形式）；MVP 用 LLM 静态推断近似并标置信度；二期变异性测试做确证 oracle + 校准数据（LLM 判断 vs 突变体存活记录对答案，量化 LLM 层准确率）。
 _Avoid_: 把 LLM 断言质量判断当作实锤（它是推断档，会出错）
