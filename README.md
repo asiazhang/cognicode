@@ -1,6 +1,6 @@
 # CogniCode
 
-> 仓库级 **AI 技术债**识别与展示工具（转型中）。
+> 仓库级 **AI 技术债**识别与展示工具（重定位已锁定，skill 实现中）。
 
 AI 编程 agent 正在成为代码的主要作者之一，一种新的债随之积累：**对 AI 不友好的债**——会让下一个 agent 迷路、犯错或返工的仓库状态，比如没人外化的隐式约定、改 A 必须改 B 但代码里看不出来的耦合、跑不起来的验证回路、主动误导人的过时文档。这种债的利息由 agent 支付（多花 token、改错地方、部分重构留下不一致），但既有工具全部以人类维护成本为判据，没有谁测量它。
 
@@ -62,17 +62,20 @@ CogniCode 正在从「AI 原生程度打分工具」转型为这个空档的填�
 
 ## 当前状态
 
-转型进行中（v0.2.0-dev）。已完成：债分类学（20 类型）、痛点与空档调研、资产盘点与仓库清理；进行中：skill 集合结构设计（[#42](https://github.com/asiazhang/cognicode/issues/42)）、DEBT.md 样例（[#43](https://github.com/asiazhang/cognicode/issues/43)）、重定位决策文档（[#44](https://github.com/asiazhang/cognicode/issues/44)）。规划与决策索引见 [wayfinder 地图 #39](https://github.com/asiazhang/cognicode/issues/39)。
+重定位决策已锁定（[ADR-0006](docs/adr/0006-relocate-to-ai-debt-identification.md)），wayfinder 决策链全部闭合（[地图 #39](https://github.com/asiazhang/cognicode/issues/39) 已收官）：
 
-现存 CLI 为重定位清理后的静态提取壳（`cognicode scan <repo>`，tree-sitter 符号提取 + 静态信号），最终形态待 skill 结构票定夺：
+- **已完成**：债分类学（20 类型）、痛点与空档调研、七族判据文件与 17 份逐规则详解、skill 结构设计、仓库清仓、重定位决策文档、[DEBT.md 样例实战验证](cognicode-debt/samples/DEBT.sample-open-vibe-island.md)（15 债项，展示形态成立）
+- **进行中**：`cognicode-debt` skill 本体——SKILL.md 编排协议与确定性提取脚本（样例实战回修出三个执行协议缺口：子代理 JSON 校验、ID 锚点三形态、跨族去重规则）
+- **二期**：动态测量实证校验（变异性测试 oracle、有效上下文校准）
+
+现存 CLI 为旧形态遗留的静态提取壳（`cognicode scan <repo>`，tree-sitter 符号提取 + 静态信号），按 ADR-0006 降为脚本副产品，终将随 skill 化退役：
 
 ```bash
 git clone https://github.com/asiazhang/cognicode.git
 cd cognicode
 uv sync --extra dev
-cognicode scan <repo>          # 静态信号提取（复用线）
+cognicode scan <repo>          # 静态信号提取（复用线，遗留）
 ```
-
 ## 项目结构
 
 ```
@@ -90,9 +93,10 @@ tests/                  # pytest 测试套件
 docs/                   # ADR / 调研 / 域文档
 cognicode-debt/
 ├── SKILL.md            # （待建）skill 编排协议
-└── criteria/           # 判据：分族子代理作业指令
-    ├── A-structural.md … G-architecture-shape.md   # 七族判据（F 并入 E）
-    └── rules/          # 17 类型逐规则详解（人类向，含正反例，供讨论）
+├── criteria/           # 判据：分族子代理作业指令
+│   ├── A-structural.md … G-architecture-shape.md   # 七族判据（F 并入 E）
+│   └── rules/          # 17 类型逐规则详解（人类向，含正反例，供讨论）
+└── samples/            # DEBT.md 样例（skill 形态的验收基准）
 ```
 
 ## 文档
@@ -104,13 +108,15 @@ cognicode-debt/
 - [`docs/research/ai-dev-pain-points-synthesis.md`](docs/research/ai-dev-pain-points-synthesis.md) — AI 开发时代痛点全景（双模型交叉验证综合结论）
 - [`docs/research/asset-inventory.md`](docs/research/asset-inventory.md) — 既有资产盘点：哪些代码可复用为债检测
 - [`cognicode-debt/criteria/`](cognicode-debt/criteria/) — 分族判据：A–G 七族子代理作业指令
+- [`docs/adr/0006-relocate-to-ai-debt-identification.md`](docs/adr/0006-relocate-to-ai-debt-identification.md) — 重定位决策记录（定位/方法学/首发形态/六维处置/MVP 范围）
+- [`cognicode-debt/samples/`](cognicode-debt/samples/) — DEBT.md 样例：真实仓库扫描产出（open-vibe-island，15 债项）
 - [`cognicode-debt/criteria/rules/`](cognicode-debt/criteria/rules/) — **逐规则详解（含实例）**：17 个债类型每条规则一份文档，正例带 agent 失败形态与预期报告行、反例讲清不报边界，「讨论要点」节留给评审
 - [`docs/adr/`](docs/adr/) — 架构决策记录
 - [`docs/agents/`](docs/agents/) — agent 工作约定（issue 跟踪、triage、域文档）
 
 ## 状态
 
-转型中。决策流程走 [wayfinder 地图 #39](https://github.com/asiazhang/cognicode/issues/39)，issue 跟踪见 [GitHub Issues](https://github.com/asiazhang/cognicode/issues)。
+重定位决策已锁定，进入 skill 实现阶段。决策记录见 [ADR-0006](docs/adr/0006-relocate-to-ai-debt-identification.md)，issue 跟踪见 [GitHub Issues](https://github.com/asiazhang/cognicode/issues)。
 
 ## License
 
