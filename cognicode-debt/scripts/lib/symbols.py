@@ -33,6 +33,8 @@ except ImportError:  # pragma: no cover
 
 # 扩展名 → tree-sitter 语言名（tree-sitter-language-pack 命名）
 _EXT_TO_LANG: dict[str, str] = {
+    ".css": "css",  # css 无符号提取（无符号节点映射），仅供 big-file/
+                   # duplicate-exact 的文件域判定（样例仓 styles_v3.css 实锤簇）
     ".py": "python",
     ".js": "javascript",
     ".jsx": "javascript",
@@ -60,20 +62,25 @@ _EXT_TO_LANG: dict[str, str] = {
 # 符号节点类型 → 符号类别（tree-sitter AST 节点名，实测）
 # method = 类内方法（php method_declaration / js method_definition）
 # function = 顶层函数（python/js/go/... 的 function_definition/function_declaration）
-# class = 类（class_declaration / class_definition）
+# class = 类（class_declaration / class_definition；Swift 的 struct/enum/
+# protocol/extension/actor 也都落 class_declaration——类型面统一记 class）
 _SYMBOL_NODE_TYPES: dict[str, str] = {
     "function_definition": "function",   # python/go/rust/... 顶层函数
-    "function_declaration": "function",  # js/ts 顶层函数
+    "function_declaration": "function",  # js/ts 顶层函数 + swift 函数与方法
     "method_declaration": "method",      # php 类内方法
     "method_definition": "method",       # js/ts 类内方法
-    "class_declaration": "class",        # js/ts/php 类
+    "class_declaration": "class",        # js/ts/php 类 + swift 全类型声明
     "class_definition": "class",         # python 类
 }
 
 # 符号名称所在的子节点类型（语言相关，实测）
+# simple_identifier：swift 的函数/方法名节点（#59 实测补——样例仓是
+# Swift 仓，缺它则整个 Swift 符号面为空）
 _NAME_NODE_TYPES: frozenset[str] = frozenset(
-    {"identifier", "name", "property_identifier"}
+    {"identifier", "name", "property_identifier", "simple_identifier",
+     "type_identifier"},
 )
+
 
 
 @dataclass(frozen=True)
@@ -162,8 +169,9 @@ def _symbols_in_file(root: Path, rel: Path, lang: str) -> list[Symbol]:
     with open(root / rel, "rb") as f:
         src = f.read()
     tree = get_parser(lang).parse(src)
-    if tree.root_node.has_error:
-        return []
+    # 注意：不因 has_error 弃整个文件（#59 实测修正——样例仓 Swift 6 的
+    # `isolated deinit` 语法 tree-sitter 尚不支持，has_error=True 时文件
+    # 里其余符号仍完整可提取；ERROR 节点本身不匹配符号类型，walk 自然跳过）
     found: list[Symbol] = []
     current: list = [tree.root_node]
     while current:

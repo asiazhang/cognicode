@@ -115,7 +115,12 @@ class TestPerExtractorTolerance:
         scan_meta = json.loads((out / "scan.json").read_text(encoding="utf-8"))
         by_name = {r["extractor"]: r["status"] for r in scan_meta["extractors"]}
         assert by_name == {"symbols": "failed", "static-signals": "ok",
-                           "probe": "ok"}
+                           "probe": "ok", "hotspot": "ok", "test-gap": "ok",
+                           "big-file": "ok", "duplicate-exact": "ok"}
+        # big-file 的注入依赖（symbols）失败 → 符号数记 null，五元组缺角不炸
+        big = json.loads((out / "big_file.json").read_text(encoding="utf-8"))
+        assert big["status"] == "ok"
+        assert all(f["symbols"] is None for f in big["data"]["files"])
 
     def test_all_failed_returns_one(self, tmp_path, monkeypatch):
         repo = _make_repo(tmp_path)

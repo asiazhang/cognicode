@@ -10,23 +10,28 @@
 - **确定性**：同一 commit 重复扫描，工件字节稳定（提取层零 LLM；LLM 语义输出发生在管线后段，不落本目录）。
 - **per-extractor 容错**：单个提取器失败只**缩窄**当趟产出（该提取器工件记 `status: "failed"` + 错误记录），不炸整趟扫描。某类工件缺失时，消费方按「该族无候选」处理。
 - **自描述**：每个工件带提取器名（`extractor`）与状态（`status: "ok" | "failed"`），失败时附错误摘要。
+- **确定性**：同一 commit 重复扫描，工件字节稳定（提取层零 LLM；LLM 语义输出发生在管线后段，不落本目录）。
+- **per-extractor 容错**：单个提取器失败只**缩窄**当趟产出（该提取器工件记 `status: "failed"` + 错误记录），不炸整趟扫描。某类工件缺失时，消费方按「该族无候选」处理。
+- **自描述**：每个工件带提取器名（`extractor`）与状态（`status: "ok" | "failed"`），失败时附错误摘要。
 - **被扫仓库视角零侵入**：只写 `.cognicode/debt-scan/`；渲染器输出（HTML）落**临时目录**（#66 决议），不写被扫仓库。
-
+- **git 时间窗锚定 HEAD**（#59 新增）：hotspot 的 90 天窗口以 HEAD commit 日期为锚，不随运行时间漂移；重跑同基准 commit 窗口一致。
 ## 2. 工件位
 
 ```
 .cognicode/debt-scan/
-├── scan.json          # 扫描元信息（本目录的入口索引）
-├── symbols.json       # 符号提取（symbols 提取器）
-├── static_signals.json# 8 静态信号（static-signals 提取器）
-├── probe.json         # 环境探测定位面（probe 提取器）
-├── hotspot.json       # git 热点（hotspot 提取器；提取器本体归 #59）
-├── debt.json          # 债项清单（LLM 写手产出；管线后段，本骨架预留位）
-└── report.html        # 渲染产物（渲染器产出；临时目录，本骨架预留位）
+├── scan.json           # 扫描元信息（本目录的入口索引）
+├── symbols.json        # 符号提取（symbols 提取器）
+├── static_signals.json # 8 静态信号（static-signals 提取器）
+├── probe.json          # 环境探测定位面（probe 提取器）
+├── hotspot.json        # git 热点：90 天窗口 per-file 改动次数（hotspot 提取器，#59）
+├── test_gap.json       # 测试缺口两层漏斗（test-gap 提取器，#59）
+├── big_file.json       # 体量五元组 + 候选线（big-file 提取器，#59）
+├── duplicate_exact.json# exact 重复簇，MD5 簇锚（duplicate-exact 提取器，#59）
+├── debt.json           # 债项清单（LLM 写手产出；管线后段，本骨架预留位）
+└── report.html         # 渲染产物（渲染器产出；临时目录，本骨架预留位）
 ```
 
-未实现的提取器（hotspot、debt 清单、report 渲染）不落空文件，只是位在协议中预留（见 §4）。
-
+未实现的提取器（debt 清单、report 渲染）不落空文件，只是位在协议中预留（见 §4）。
 ## 3. 工件信封（通用形状）
 
 每个提取器工件是一个 JSON 对象，信封字段统一：
@@ -49,13 +54,15 @@
 
 | 提取器名 | 工件 | 状态 | 归属票 |
 |---|---|---|---|
-| `symbols` | `symbols.json` | 本票实现 | #58 |
-| `static-signals` | `static_signals.json` | 本票实现 | #58 |
-| `probe` | `probe.json` | 本票实现 | #58 |
-| `hotspot` | `hotspot.json` | 预留位，提取器本体待写 | #59 |
+| `symbols` | `symbols.json` | 已实现 | #58 |
+| `static-signals` | `static_signals.json` | 已实现 | #58 |
+| `probe` | `probe.json` | 已实现 | #58 |
+| `hotspot` | `hotspot.json` | 已实现 | #59 |
+| `test-gap` | `test_gap.json` | 已实现 | #59 |
+| `big-file` | `big_file.json` | 已实现 | #59 |
+| `duplicate-exact` | `duplicate_exact.json` | 已实现（exact 档 MVP；near 档集成缝在 `tool_config`） | #59 |
 | （LLM 写手） | `debt.json` | 预留位，管线后段（LLM 产出，非确定性提取） | #60 |
 | （渲染器） | `report.html` | 预留位，读 `debt.json` 出 HTML，落临时目录 | #59/#61 |
-
 ## 5. 单工件最小样例
 
 `symbols.json`（载荷形状与 `Symbol` 字段一致，见 `scripts/lib/symbols.py`）：
@@ -86,9 +93,9 @@
 
 ## 7. 工具约定
 
-- 入口：`uv run cognicode-debt/scripts/scan.py <repo> [--extractors symbols,static-signals,probe] [--help]`。
-- 脚本零第三方依赖可直接运行的用 stdlib 运行；需 tree-sitter 的提取器在**本仓库**内以 `uv run --extra` / dev 环境运行（迁移脚本不自带依赖；独立分发的依赖管理属 #59）。
-- 重复运行幂等覆盖（同基准 commit 两次扫描 diff 稳定的验收在父票 #57）。
+- 入口：`uv run cognicode-debt/scripts/scan.py <repo> [--extractors <逗号清单>]`，默认全部（symbols,static-signals,probe,hotspot,test-gap,big-file,duplicate-exact）。
+- 注册表顺序即执行顺序，含**跨提取器注入**依赖：big-file 消费 symbols（符号数）与 hotspot（改动计数）；单跑 big-file 时注入缺失记 null（不炸）。
+- 脚本零第三方依赖可直接运行的用 stdlib 运行；需 tree-sitter 的提取器（symbols / test-gap / big-file 的符号数）在**本仓库**内以 `uv run --extra` / dev 环境运行（迁移脚本不自带依赖；独立分发的依赖管理属 #59 后续）。
 
 ## 8. 关联
 
