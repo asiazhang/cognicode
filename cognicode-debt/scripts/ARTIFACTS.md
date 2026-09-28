@@ -62,7 +62,7 @@
 | `big-file` | `big_file.json` | 已实现 | #59 |
 | `duplicate-exact` | `duplicate_exact.json` | 已实现（exact 档 MVP；near 档集成缝在 `tool_config`） | #59 |
 | （LLM 写手） | `debt.json` | 预留位，管线后段（LLM 产出，非确定性提取） | #60 |
-| （渲染器） | `report.html` | 预留位，读 `debt.json` 出 HTML，落临时目录 | #59/#61 |
+| （渲染器） | `report.html` | 已实现（读 `debt.json` 出 HTML，落临时目录） | #59/#61 |
 ## 5. 单工件最小样例
 
 `symbols.json`（载荷形状与 `Symbol` 字段一致，见 `scripts/lib/symbols.py`）：
