@@ -21,29 +21,37 @@
 
   <!-- ══════════ 侧边导航 ══════════ -->
   <nav id="toc" class="hidden xl:block fixed top-0 right-0 h-screen w-56 border-l border-stone-200 bg-white/80 backdrop-blur px-4 py-8 overflow-y-auto text-[12px] leading-5 z-40">
-    <div class="text-[10px] uppercase tracking-wider text-slate-400 mb-2">目录</div>
+    <div class="text-[10px] uppercase tracking-wider text-slate-400 mb-2">目录 · 按优先级 × 类型</div>
     <a href="#matrix" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">优先级矩阵</a>
-    <a href="#top-recommendation" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">Top recommendation</a>
-    <div class="mt-3 mb-1 text-[10px] uppercase tracking-wider text-emerald-700 font-semibold pl-2">推荐先修 · 4</div>
+    <a href="#scatter-tax" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-amber-600 font-medium hover:text-amber-700 transition-colors">★ 新增 agent 的散布税</a>
+    <div class="mt-3 mb-1 text-[10px] uppercase tracking-wider text-emerald-700 font-semibold pl-2">高带 · 4</div>
     <a href="#fix-1" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">支持矩阵三副本归一</a>
     <a href="#fix-2" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">拆解 BridgeServer</a>
     <a href="#fix-3" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">AppModel 派生抽离</a>
     <a href="#fix-4" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">ProcessMonitoring 参数化</a>
-    <div class="mt-3 mb-1 text-[10px] uppercase tracking-wider text-amber-600 font-semibold pl-2">重点类型 · 7</div>
-    <a href="#dup-design" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">design 资产重复簇</a>
-    <a href="#dup-workflow" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">工作流重述分叉</a>
-    <a href="#mono-islandview" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">IslandPanelView 状态机</a>
-    <a href="#mono-hookinstall" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">HookInstall 三域拆出</a>
-    <a href="#flaky-sleep" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">蒙眼 sleep → 等条件</a>
-    <a href="#flaky-clock" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">墙钟 → 注入 clock</a>
-    <a href="#gap-core" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">Core 保护空洞 15%</a>
-    <a href="#gap-app" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">coordinator 空洞 24%</a>
-    <div class="mt-3 mb-1 text-[10px] uppercase tracking-wider text-slate-400 font-semibold pl-2">其余 · 5</div>
-    <a href="#docrot-agents" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">AGENTS.md 断链</a>
-    <a href="#docrot-claude" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">CLAUDE.md 断链</a>
-    <a href="#implicit-contract" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">隐式契约进签名</a>
-    <a href="#build-entry" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">AX 验证回路</a>
-    <a href="#oral-tradition" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">design 口头传统</a>
+    <div class="mt-3 mb-1 text-[10px] uppercase tracking-wider text-amber-600 font-semibold pl-2">中带 · 12</div>
+    <div class="pl-2 text-[10px] text-slate-400 mb-0.5">重复代码</div>
+    <a href="#dup-design" class="toc-link block py-0.5 pl-3 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">design 资产重复簇</a>
+    <a href="#dup-workflow" class="toc-link block py-0.5 pl-3 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">工作流重述分叉</a>
+    <div class="pl-2 text-[10px] text-slate-400 mb-0.5 mt-1">巨石文件</div>
+    <a href="#mono-islandview" class="toc-link block py-0.5 pl-3 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">IslandPanelView 状态机</a>
+    <a href="#mono-hookinstall" class="toc-link block py-0.5 pl-3 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">HookInstall 三域拆出</a>
+    <div class="pl-2 text-[10px] text-slate-400 mb-0.5 mt-1">脆弱测试</div>
+    <a href="#flaky-sleep" class="toc-link block py-0.5 pl-3 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">蒙眼 sleep → 等条件</a>
+    <a href="#flaky-clock" class="toc-link block py-0.5 pl-3 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">墙钟 → 注入 clock</a>
+    <div class="pl-2 text-[10px] text-slate-400 mb-0.5 mt-1">测试缺口</div>
+    <a href="#gap-core" class="toc-link block py-0.5 pl-3 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">Core 保护空洞 15%</a>
+    <a href="#gap-app" class="toc-link block py-0.5 pl-3 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">coordinator 空洞 24%</a>
+    <div class="mt-3 mb-1 text-[10px] uppercase tracking-wider text-slate-400 font-semibold pl-2">低带 · 5</div>
+    <div class="pl-2 text-[10px] text-slate-400 mb-0.5">文档腐烂</div>
+    <a href="#docrot-agents" class="toc-link block py-0.5 pl-3 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">AGENTS.md 断链</a>
+    <a href="#docrot-claude" class="toc-link block py-0.5 pl-3 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">CLAUDE.md 断链</a>
+    <div class="pl-2 text-[10px] text-slate-400 mb-0.5 mt-1">隐式契约</div>
+    <a href="#implicit-contract" class="toc-link block py-0.5 pl-3 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">契约进签名</a>
+    <div class="pl-2 text-[10px] text-slate-400 mb-0.5 mt-1">构建入口</div>
+    <a href="#build-entry" class="toc-link block py-0.5 pl-3 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">AX 验证回路</a>
+    <div class="pl-2 text-[10px] text-slate-400 mb-0.5 mt-1">口头传统</div>
+    <a href="#oral-tradition" class="toc-link block py-0.5 pl-3 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">design 口头传统</a>
   </nav>
 
 <main class="max-w-5xl mx-auto px-6 py-12 space-y-14 xl:mr-64">
@@ -81,12 +89,12 @@
   <section id="matrix" class="space-y-3">
     <div class="flex items-baseline gap-3">
       <h2 class="serif text-xl font-bold">先修哪些：严重度 × 被踩频率</h2>
-      <span class="text-xs text-slate-500">右上角 = 又重又被反复踩到；悬停查看债项</span>
+      <span class="text-xs text-slate-500">每个点是一项债；悬停查看热度</span>
     </div>
     <div class="rounded-lg border border-stone-200 bg-white p-4 overflow-x-auto">
       <svg viewBox="0 0 860 430" class="w-full min-w-[680px] h-auto" role="img" aria-label="债项优先级矩阵">
         <rect x="70" y="10" width="390" height="185" fill="#fef3c7" opacity="0.55"/>
-        <text x="455" y="30" text-anchor="end" fill="#b45309" font-size="11" class="mono">推荐先修带</text>
+        <text x="455" y="30" text-anchor="end" fill="#b45309" font-size="11" class="mono">高带</text>
         <line x1="70" y1="10" x2="70" y2="400" stroke="#d6d3d1" stroke-width="1.5"/>
         <line x1="70" y1="400" x2="850" y2="400" stroke="#d6d3d1" stroke-width="1.5"/>
         <text x="30" y="205" transform="rotate(-90 30 205)" text-anchor="middle" fill="#78716c" font-size="12">严重度</text>
@@ -122,7 +130,7 @@
         </g>
       </svg>
       <div class="flex flex-wrap gap-4 mt-3 text-xs text-slate-500">
-        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#b45309] inline-block"></span>推荐先修（高 ∩ 热点）</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#b45309] inline-block"></span>高带（4 项，卡内标热点）</span>
         <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#78716c] inline-block"></span>其余中带</span>
         <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#c3bdb8] inline-block"></span>低带 / 沉睡债</span>
       </div>
@@ -130,25 +138,63 @@
   </section>
 
   <!-- ══════════ Top recommendation ══════════ -->
-  <section id="top-recommendation">
-    <div class="rounded-xl border-2 border-emerald-600 bg-emerald-50 p-6">
-      <div class="flex items-baseline gap-3 flex-wrap">
-        <span class="mono text-[11px] uppercase tracking-wider text-white bg-emerald-700 rounded px-2 py-0.5">Top recommendation</span>
-        <a href="#fix-1" class="serif text-xl font-bold text-emerald-900 hover:underline">收敛支持矩阵为单一真值</a>
+    <!-- ══════════ 新发现：新增 agent 的散布税 ══════════ -->
+  <section id="scatter-tax" class="space-y-8">
+    <div class="rounded-xl border-2 border-amber-500 bg-amber-50/60 p-6 space-y-4">
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        <span class="mono text-[11px] text-white bg-amber-600 rounded px-2 py-0.5 font-semibold uppercase tracking-wider">横向发现 · 本报告新增</span>
+        <h2 class="serif text-2xl font-bold">新增一个 agent 的散布税</h2>
       </div>
-      <p class="mt-2 text-sm text-emerald-900/80 leading-6 max-w-3xl">三份副本已被改 34 次仍在分叉，修复只需一次人工裁决 + 收敛——全清单里唯一「高严重度 × 高热点 × 低成本」三项全占的债，先修它立竿见影。其余三项推荐先修均为结构性拆分，属「先决策、再排期」。</p>
+      <p class="text-sm leading-7 text-slate-700 max-w-3xl">「新增一个工具要改很多很多文件」——这不是错觉，是本仓库最重的设计问题，也是三张巨石卡的共同成因。证据来自 Grok Build 集成 commit <span class="mono text-xs">10519c5</span>（2026-09-03）：新增一个 agent 需要触碰 <strong class="text-amber-800">21 个文件、+2327 行</strong>，其中 <strong class="text-amber-800">13 个既有文件</strong>要散布 <span class="mono text-xs">.grok</span> 分支，主集成后还需 <strong class="text-amber-800">7 个跟进 fix</strong>（含「Grok 被当成中断隐藏」「Pi 撞色」这类散布遗漏的典型症状）。</p>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="rounded-lg border border-stone-200 bg-white p-3">
+          <div class="text-[10px] uppercase tracking-wider text-slate-400 mb-1">前 · 一个 agent 的知识散布 13 处</div>
+          <pre class="mermaid">
+flowchart TB
+  dev["开发者：新增 agent X"] --> b["BridgeServer<br/>26 处 grok"]:::bad
+  dev --> h["HookInstallationCoordinator<br/>37 处"]:::bad
+  dev --> pm["ProcessMonitoringCoordinator<br/>20 处"]:::bad
+  dev --> s["SetupCLI · 30 处<br/>SettingsView · 12 处"]:::bad
+  dev --> m["AppModel · AgentSession ·<br/>Transport · CLI · 文档 ×4"]:::bad
+  classDef bad stroke:#dc2626,stroke-width:2px;
+          </pre>
+        </div>
+        <div class="rounded-lg border border-stone-200 bg-white p-3">
+          <div class="text-[10px] uppercase tracking-wider text-slate-400 mb-1">后 · agent 集中为一个模块，注册接入</div>
+          <pre class="mermaid">
+flowchart TB
+  dev2["开发者：新增 agent X"] --> mod["AgentXModule<br/>hook + 安装 + 匹配 + 展示<br/>自包含"]:::deep
+  mod --> reg["AgentRegistry<br/>一处注册，全局可见"]:::deep
+  reg -.自动出现.-> ui[Settings / 岛屿 UI]
+  reg -.自动出现.-> bridge[Bridge 路由]
+  classDef deep fill:#1e293b,color:#fff,stroke:#1e293b;
+          </pre>
+        </div>
+      </div>
+      <div class="text-sm leading-7 text-slate-700 space-y-2">
+        <p><strong class="text-slate-900">为什么是设计问题：</strong>「一个 agent」这个概念没有模块边界——它的知识（hook 协议、安装位置、进程匹配、展示色）按<strong>技术层</strong>切分在 13 个文件里（每个协调器一处 switch、每个 CLI 一处参数、每个文档一份矩阵），而不是按<strong>领域</strong>聚合。每支持一个新 agent，就要在所有层各改一刀：Grok 集成在 BridgeServer 里加 185 行、HookInstallationCoordinator 里加 107 行、ProcessMonitoringCoordinator 里加 92 行——三个巨石正是这样被一次次喂大的。散布还制造遗漏面：7 个跟进 fix 里「Grok 被当成中断隐藏」「Pi 与 Grok 撞色」都是漏改某处分支的典型症状。</p>
+        <p><strong class="text-slate-900">怎么修：</strong>立 AgentModule 协议（hook 解码 + 安装/卸载 + 进程匹配 + 展示属性自描述），新 agent 实现一个模块 + AgentRegistry 一处注册；各协调器/CLI/UI 只消费 registry。这是三张巨石卡（拆解 BridgeServer / AppModel 派生抽离 / ProcessMonitoring 参数化）的统一解法——按层拆巨石只是把散布搬进更多文件，按 agent 聚合才能同时消解巨石与散布税。</p>
+      </div>
+      <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3">
+        <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
+        <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
+          <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>新增 agent：21 文件 → 1 模块</li>
+          <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>散布遗漏面（漏改分支）归零</li>
+          <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>巨石不再随 agent 数线性膨胀</li>
+        </ul>
+      </div>
     </div>
   </section>
 
-  <!-- ══════════ 推荐先修 ══════════ -->
-  <section id="recommended" class="space-y-8">
-    <h2 class="serif text-2xl font-bold border-b border-stone-200 pb-2">推荐先修 <span class="text-sm font-normal text-slate-500 mono">4 项 · 高严重度 ∩ 高 git 热点</span></h2>
+  <!-- ══════════ 高带 ══════════ -->
+  <section id="high-band" class="space-y-8">
+    <h2 class="serif text-2xl font-bold border-b border-stone-200 pb-2">高带 <span class="text-sm font-normal text-slate-500 mono">4 项 · 热点标注在卡内</span></h2>
 
     <!-- ── #1 支持矩阵 ── -->
     <article id="fix-1" class="rounded-xl border border-stone-200 bg-white overflow-hidden">
       <div class="p-6 space-y-4">
         <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-          <span class="mono text-[11px] text-white bg-emerald-700 rounded px-2 py-0.5 font-semibold">先修 #1</span>
+          <span class="mono text-[11px] text-white bg-emerald-700 rounded px-2 py-0.5 font-semibold">高 · 1</span>
           <h3 class="serif text-lg font-bold">收敛支持矩阵：三份漂移副本归一</h3>
           <span class="text-xs text-slate-500 mono">duplicate-code · 确证 · 置信度高</span>
         </div>
@@ -204,7 +250,7 @@ flowchart TB
     <article id="fix-2" class="rounded-xl border border-stone-200 bg-white overflow-hidden">
       <div class="p-6 space-y-4">
         <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-          <span class="mono text-[11px] text-white bg-emerald-700 rounded px-2 py-0.5 font-semibold">先修 #2</span>
+          <span class="mono text-[11px] text-white bg-emerald-700 rounded px-2 py-0.5 font-semibold">高 · 2</span>
           <h3 class="serif text-lg font-bold">拆解 BridgeServer：按 agent 分离 hook 处理器家族</h3>
           <span class="text-xs text-slate-500 mono">monolith-file · 确证 · 置信度高</span>
         </div>
@@ -260,7 +306,7 @@ flowchart TB
     <article id="fix-3" class="rounded-xl border border-stone-200 bg-white overflow-hidden">
       <div class="p-6 space-y-4">
         <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-          <span class="mono text-[11px] text-white bg-emerald-700 rounded px-2 py-0.5 font-semibold">先修 #3</span>
+          <span class="mono text-[11px] text-white bg-emerald-700 rounded px-2 py-0.5 font-semibold">高 · 3</span>
           <h3 class="serif text-lg font-bold">抽离 AppModel 派生逻辑：让副作用显式化</h3>
           <span class="text-xs text-slate-500 mono">monolith-file · 确证 · 置信度中</span>
         </div>
@@ -313,7 +359,7 @@ flowchart TB
     <article id="fix-4" class="rounded-xl border border-stone-200 bg-white overflow-hidden">
       <div class="p-6 space-y-4">
         <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-          <span class="mono text-[11px] text-white bg-emerald-700 rounded px-2 py-0.5 font-semibold">先修 #4</span>
+          <span class="mono text-[11px] text-white bg-emerald-700 rounded px-2 py-0.5 font-semibold">高 · 4</span>
           <h3 class="serif text-lg font-bold">参数化 ProcessMonitoring：收敛 5 agent 匹配家族</h3>
           <span class="text-xs text-slate-500 mono">monolith-file · 风险 · 置信度中</span>
         </div>
@@ -354,7 +400,7 @@ flowchart TB
         </div>
         <div class="text-sm leading-7 text-slate-700 space-y-2">
           <p><strong class="text-slate-900">为什么是债：</strong>进程 liveness 跟踪 + 5 个 agent 的 uniqueTracked*Session 家族（各自进程匹配与合成会话逻辑）+ TTY 认领 + 跨工具清洗。与 BridgeServer 同型的 per-agent 复制家族 + 共享 reconcile 语义：新增/修改某 agent 的匹配规则需理解主循环与其他 agent 匹配块的共享不变量，家族式复制使 agent 的 diff 定位困难。</p>
-          <p><strong class="text-slate-900">怎么修：</strong>per-agent 匹配抽统一协议/泛型骨架，agent 差异参数化。与先修 #2 同型，可共用拆分手法、一次评审。</p>
+          <p><strong class="text-slate-900">怎么修：</strong>per-agent 匹配抽统一协议/泛型骨架，agent 差异参数化。与高 · 2（BridgeServer）同型，可共用拆分手法、一次评审——统一按 AgentModule 聚合则一并消解（见「散布税」）。</p>
         </div>
         <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3 mt-1">
           <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
@@ -368,12 +414,15 @@ flowchart TB
     </article>
   </section>
 
-  <!-- ══════════ 重点类型 ══════════ -->
-  <section id="focus-types" class="space-y-8">
-    <h2 class="serif text-2xl font-bold border-b border-stone-200 pb-2">重点类型 <span class="text-sm font-normal text-slate-500 mono">7 项 · 依据：研究证据强 ∩ AI 迭代高发</span></h2>
+  <!-- ══════════ 中带（按类型分组） ══════════ -->
+  <section id="by-type" class="space-y-8">
+    <h2 class="serif text-2xl font-bold border-b border-stone-200 pb-2">中带 · 按类型分组 <span class="text-sm font-normal text-slate-500 mono">12 项 · 类型组内按严重度排</span></h2>
 
-    <!-- design bundle dup -->
-    <article id="dup-design" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <div class="pt-2">
+      <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500">重复代码 duplicate-code <span class="mono text-[11px] font-normal text-slate-400">2 项 · 唯一真值违反</span></h3>
+    </div>
+
+<article id="dup-design" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-amber-600 rounded px-2 py-0.5 font-semibold">择机</span>
         <h3 class="serif text-lg font-bold">design 资产跨 bundle 重复簇</h3>
@@ -417,8 +466,7 @@ flowchart TB
       </div>
     </article>
 
-    <!-- workflow restatement -->
-    <article id="dup-workflow" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+<article id="dup-workflow" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-amber-600 rounded px-2 py-0.5 font-semibold">择机</span>
         <h3 class="serif text-lg font-bold">工作流重述分叉：CLAUDE.md vs AGENTS.md</h3>
@@ -461,8 +509,11 @@ flowchart TB
       </div>
     </article>
 
-    <!-- IslandPanelView -->
-    <article id="mono-islandview" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <div class="pt-2">
+      <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500">巨石文件 monolith-file <span class="mono text-[11px] font-normal text-slate-400">2 项 · 与「散布税」同根</span></h3>
+    </div>
+
+<article id="mono-islandview" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-amber-600 rounded px-2 py-0.5 font-semibold">择机</span>
         <h3 class="serif text-lg font-bold">IslandPanelView：开合状态机与布局解耦</h3>
@@ -506,8 +557,7 @@ flowchart TB
       </div>
     </article>
 
-    <!-- HookInstallationCoordinator -->
-    <article id="mono-hookinstall" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+<article id="mono-hookinstall" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-amber-600 rounded px-2 py-0.5 font-semibold">择机</span>
         <h3 class="serif text-lg font-bold">HookInstallationCoordinator：迁移与自修复域拆出</h3>
@@ -552,8 +602,11 @@ flowchart TB
       </div>
     </article>
 
-    <!-- flaky sleep -->
-    <article id="flaky-sleep" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <div class="pt-2">
+      <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500">脆弱测试 flaky-test <span class="mono text-[11px] font-normal text-slate-400">2 项 · agent 的归因生命线</span></h3>
+    </div>
+
+<article id="flaky-sleep" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-amber-600 rounded px-2 py-0.5 font-semibold">择机</span>
         <h3 class="serif text-lg font-bold">蒙眼 sleep 改等条件：5 处时间性红绿</h3>
@@ -602,8 +655,7 @@ sequenceDiagram
       </div>
     </article>
 
-    <!-- flaky wall clock -->
-    <article id="flaky-clock" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+<article id="flaky-clock" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-amber-600 rounded px-2 py-0.5 font-semibold">择机</span>
         <h3 class="serif text-lg font-bold">墙钟断言注入 clock：已被 CI 真实 flaky 一次</h3>
@@ -650,8 +702,11 @@ sequenceDiagram
       </div>
     </article>
 
-    <!-- test-gap Core -->
-    <article id="gap-core" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <div class="pt-2">
+      <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500">测试缺口 test-gap <span class="mono text-[11px] font-normal text-slate-400">2 项 · 保护不存在</span></h3>
+    </div>
+
+<article id="gap-core" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-amber-600 rounded px-2 py-0.5 font-semibold">择机</span>
         <h3 class="serif text-lg font-bold">OpenIslandCore 保护空洞：~15% 声明零触达</h3>
@@ -701,8 +756,7 @@ sequenceDiagram
       </div>
     </article>
 
-    <!-- test-gap App -->
-    <article id="gap-app" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+<article id="gap-app" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-amber-600 rounded px-2 py-0.5 font-semibold">择机</span>
         <h3 class="serif text-lg font-bold">coordinator 层保护空洞：~24% 声明零触达</h3>
@@ -745,14 +799,17 @@ flowchart TB
         </ul>
       </div>
     </article>
+
   </section>
 
-  <!-- ══════════ 其余类型 ══════════ -->
-  <section id="other-types" class="space-y-8">
-    <h2 class="serif text-2xl font-bold border-b border-stone-200 pb-2">其余类型 <span class="text-sm font-normal text-slate-500 mono">4 项 · 多为沉睡债（热点 0），修不修看团队节奏</span></h2>
+<section id="low-band" class="space-y-8">
+    <h2 class="serif text-2xl font-bold border-b border-stone-200 pb-2">低带 · 按类型分组 <span class="text-sm font-normal text-slate-500 mono">5 项 · 多为沉睡债（热点 0）</span></h2>
 
-    <!-- doc-rot AGENTS.md -->
-    <article id="docrot-agents" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <div class="pt-2">
+      <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500">文档腐烂 doc-rot <span class="mono text-[11px] font-normal text-slate-400">2 项 · 研究票强证据，但本仓库内均沉睡</span></h3>
+    </div>
+
+<article id="docrot-agents" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-slate-500 rounded px-2 py-0.5 font-semibold">沉睡</span>
         <h3 class="serif text-lg font-bold">AGENTS.md worktree 规则：硬编码维护者绝对路径</h3>
@@ -794,8 +851,7 @@ flowchart LR
       </div>
     </article>
 
-    <!-- doc-rot CLAUDE.md -->
-    <article id="docrot-claude" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+<article id="docrot-claude" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-slate-500 rounded px-2 py-0.5 font-semibold">沉睡</span>
         <h3 class="serif text-lg font-bold">CLAUDE.md key-files：声明的入口文件不存在</h3>
@@ -837,8 +893,11 @@ flowchart LR
       </div>
     </article>
 
-    <!-- implicit-contract -->
-    <article id="implicit-contract" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <div class="pt-2">
+      <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500">隐式契约 implicit-contract <span class="mono text-[11px] font-normal text-slate-400">1 项 · 研究票建议中偏高</span></h3>
+    </div>
+
+<article id="implicit-contract" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-slate-500 rounded px-2 py-0.5 font-semibold">沉睡</span>
         <h3 class="serif text-lg font-bold">migrateIntentStoreIfNeeded：顺序不变量只在注释里</h3>
@@ -885,8 +944,11 @@ sequenceDiagram
       </div>
     </article>
 
-    <!-- build-entry -->
-    <article id="build-entry" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <div class="pt-2">
+      <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500">构建入口 build-entry-unclear <span class="mono text-[11px] font-normal text-slate-400">1 项 · 验证回路人工前置</span></h3>
+    </div>
+
+<article id="build-entry" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-slate-500 rounded px-2 py-0.5 font-semibold">沉睡</span>
         <h3 class="serif text-lg font-bold">AX 验证回路：一次性人工前置不可自举</h3>
@@ -929,8 +991,11 @@ flowchart TB
       </div>
     </article>
 
-    <!-- oral-tradition -->
-    <article id="oral-tradition" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <div class="pt-2">
+      <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500">口头传统 oral-tradition <span class="mono text-[11px] font-normal text-slate-400">1 项 · 随簇消解</span></h3>
+    </div>
+
+<article id="oral-tradition" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-slate-500 rounded px-2 py-0.5 font-semibold">沉睡</span>
         <h3 class="serif text-lg font-bold">design/ 目录：权威信息只活在维护者脑子里</h3>
@@ -971,12 +1036,13 @@ flowchart LR
         </ul>
       </div>
     </article>
+
   </section>
 
-  <!-- ══════════ Footer ══════════ -->
+<!-- ══════════ Footer ══════════ -->
   <footer class="border-t border-stone-200 pt-6 text-xs leading-5 text-slate-400 space-y-1">
     <p><strong class="text-slate-500">证据等级</strong>：确证 = 可复现的静态实锤；风险 = 静态反模式命中 / LLM 推断，未动态验证。 <strong class="text-slate-500">未覆盖族</strong>：D 依赖与环境、G 架构形状（无候选过线）。 <strong class="text-slate-500">销账</strong>：修复后重跑扫描，对应条目自动消失；git 历史 + diff 即审计轨迹。</p>
-    <p>本报告由 cognicode 生成 · 原型讨论稿（wayfinder #64 v2）· 高 3 / 中 12 / 低 2，独立计数 15 项</p>
+    <p>本报告由 cognicode 生成 · 原型讨论稿（wayfinder #64 v3）· 高 3 / 中 12 / 低 2 · 独立计数 15 项 + 1 项横向发现（散布税）</p>
   </footer>
 
 </main>
