@@ -23,8 +23,8 @@
   <nav id="toc" class="hidden xl:block fixed top-0 right-0 h-screen w-64 shrink-0 border-l border-stone-200 bg-white/80 backdrop-blur px-4 py-8 overflow-y-auto text-[12px] leading-5 z-40">
     <div class="text-[10px] uppercase tracking-wider text-slate-400 mb-2">目录 · 按严重度 × 类型</div>
     <a href="#matrix" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">优先级矩阵</a>
-    <a href="#scatter-tax" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-amber-600 font-medium hover:text-amber-700 transition-colors">★ 横向发现：新增 agent 的散布税</a>
-    <div class="mt-3 mb-1 text-[10px] uppercase tracking-wider text-emerald-700 font-semibold pl-2">高严重度 · 4</div>
+    <div class="mt-3 mb-1 text-[10px] uppercase tracking-wider text-emerald-700 font-semibold pl-2">高严重度 · 5</div>
+    <a href="#scatter-tax" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">新增 agent 改 13 个文件</a>
     <a href="#fix-1" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">支持矩阵三副本归一</a>
     <a href="#fix-2" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">拆解 BridgeServer</a>
     <a href="#fix-3" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">AppModel 派生抽离</a>
@@ -138,16 +138,25 @@
   </section>
 
   <!-- ══════════ Top recommendation ══════════ -->
-    <!-- ══════════ 新发现：新增 agent 的散布税 ══════════ -->
-  <section id="scatter-tax" class="space-y-8">
-    <div class="rounded-xl border-2 border-amber-500 bg-amber-50/60 p-6 space-y-4">
+
+
+  <!-- ══════════ 高严重度 ══════════ -->
+  <section id="high-band" class="space-y-8">
+    <h2 class="serif text-2xl font-bold border-b border-stone-200 pb-2">高严重度 <span class="text-sm font-normal text-slate-500 mono">5 项 · 近期改动频率标注在卡内</span></h2>
+
+    <article id="scatter-tax" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-        <span class="mono text-[11px] text-white bg-amber-600 rounded px-2 py-0.5 font-semibold uppercase tracking-wider">横向发现 · 本报告新增</span>
-        <h2 class="serif text-2xl font-bold">新增一个 agent 的散布税</h2>
+        <span class="mono text-[11px] text-white bg-emerald-700 rounded px-2 py-0.5 font-semibold">高严重度</span>
+        <h3 class="serif text-lg font-bold">新增一个 agent 需要修改 13 个既有文件</h3>
+        <span class="text-xs text-slate-500 mono">散布式设计 · 确证（git 实证）· 本报告识别的新债类型</span>
       </div>
-      <p class="text-sm leading-7 text-slate-700 max-w-3xl">「新增一个工具要改很多很多文件」——这不是错觉，是本仓库最重的设计问题，也是三张巨石卡的共同成因。证据来自 Grok Build 集成 commit <span class="mono text-xs">10519c5</span>（2026-09-03）：新增一个 agent 需要触碰 <strong class="text-amber-800">21 个文件、+2327 行</strong>，其中 <strong class="text-amber-800">13 个既有文件</strong>要散布 <span class="mono text-xs">.grok</span> 分支，主集成后还需 <strong class="text-amber-800">7 个跟进 fix</strong>（含「Grok 被当成中断隐藏」「Pi 撞色」这类散布遗漏的典型症状）。</p>
+      <div class="flex flex-wrap gap-1.5 text-[11px] mono">
+        <span class="bg-stone-100 border border-stone-200 rounded px-2 py-0.5">位置 全仓库 13 个既有文件（AgentTool 枚举的每个 switch 消费点）</span>
+        <span class="bg-stone-100 border border-stone-200 rounded px-2 py-0.5">涉及区域均为高频改动区</span>
+        <span class="bg-red-50 border border-red-200 text-red-700 rounded px-2 py-0.5">修复成本 高 · 需要架构调整</span>
+      </div>
       <div class="grid md:grid-cols-2 gap-4">
-        <div class="rounded-lg border border-stone-200 bg-white p-3">
+        <div class="rounded-lg border border-stone-200 bg-stone-50 p-3">
           <div class="text-[10px] uppercase tracking-wider text-slate-400 mb-1">前 · 一个 agent 的知识散布 13 处</div>
           <pre class="mermaid">
 flowchart TB
@@ -159,7 +168,7 @@ flowchart TB
   classDef bad stroke:#dc2626,stroke-width:2px;
           </pre>
         </div>
-        <div class="rounded-lg border border-stone-200 bg-white p-3">
+        <div class="rounded-lg border border-stone-200 bg-stone-50 p-3">
           <div class="text-[10px] uppercase tracking-wider text-slate-400 mb-1">后 · agent 集中为一个模块，注册接入</div>
           <pre class="mermaid">
 flowchart TB
@@ -172,23 +181,18 @@ flowchart TB
         </div>
       </div>
       <div class="text-sm leading-7 text-slate-700 space-y-2">
-        <p><strong class="text-slate-900">为什么是设计问题：</strong>「一个 agent」这个概念没有模块边界——它的知识（hook 协议、安装位置、进程匹配、展示色）按<strong>技术层</strong>切分在 13 个文件里（每个协调器一处 switch、每个 CLI 一处参数、每个文档一份矩阵），而不是按<strong>领域</strong>聚合。每支持一个新 agent，就要在所有层各改一刀：Grok 集成在 BridgeServer 里加 185 行、HookInstallationCoordinator 里加 107 行、ProcessMonitoringCoordinator 里加 92 行——三个巨石正是这样被一次次喂大的。散布还制造遗漏面：7 个跟进 fix 里「Grok 被当成中断隐藏」「Pi 与 Grok 撞色」都是漏改某处分支的典型症状。</p>
-        <p><strong class="text-slate-900">怎么修：</strong>立 AgentModule 协议（hook 解码 + 安装/卸载 + 进程匹配 + 展示属性自描述），新 agent 实现一个模块 + AgentRegistry 一处注册；各协调器/CLI/UI 只消费 registry。这是三张巨石卡（拆解 BridgeServer / AppModel 派生抽离 / ProcessMonitoring 参数化）的统一解法——按层拆巨石只是把散布搬进更多文件，按 agent 聚合才能同时消解巨石与散布税。</p>
+        <p><strong class="text-slate-900">为什么是债：</strong>「新增一个工具要改很多很多文件」——这个直觉是真实的。证据来自 Grok Build 集成 commit <span class="mono text-xs">10519c5</span>（2026-09-03）：新增一个 agent 需要触碰 <strong class="text-slate-900">21 个文件、+2327 行</strong>，其中 <strong class="text-slate-900">13 个既有文件</strong>要散布 <span class="mono text-xs">.grok</span> 分支（HookInstallationCoordinator 37 处、SetupCLI 30 处、BridgeServer 26 处、ProcessMonitoringCoordinator 20 处……），主集成后还需 <strong class="text-slate-900">7 个跟进修复</strong>——「Grok 取消被当成中断隐藏」「Pi 与 Grok 撞色」正是漏改某处分支的典型症状。根因：「一个 agent」没有模块边界，其知识（hook 协议、安装位置、进程匹配、展示色）按技术层切分在 13 个文件里，而不是按领域聚合。这也是本报告三张巨石卡的共同成因——每支持一个新 agent，三个巨石就被喂大一次（Grok 集成就给 BridgeServer 加了 185 行）。</p>
+        <p><strong class="text-slate-900">怎么修：</strong>立 AgentModule 协议（hook 解码 + 安装/卸载 + 进程匹配 + 展示属性自描述），新 agent 实现一个模块 + AgentRegistry 一处注册；各协调器/CLI/UI 只消费 registry。按层拆巨石只是把散布搬进更多文件，按 agent 聚合才能同时消解巨石与散布。</p>
       </div>
       <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3">
         <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
         <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
           <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>新增 agent：21 文件 → 1 模块</li>
-          <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>散布遗漏面（漏改分支）归零</li>
+          <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>漏改分支类缺陷归零</li>
           <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>巨石不再随 agent 数线性膨胀</li>
         </ul>
       </div>
-    </div>
-  </section>
-
-  <!-- ══════════ 高严重度 ══════════ -->
-  <section id="high-band" class="space-y-8">
-    <h2 class="serif text-2xl font-bold border-b border-stone-200 pb-2">高严重度 <span class="text-sm font-normal text-slate-500 mono">4 项 · 近期改动频率标注在卡内</span></h2>
+    </article>
 
     <!-- ── #1 支持矩阵 ── -->
     <article id="fix-1" class="rounded-xl border border-stone-200 bg-white overflow-hidden">
@@ -1042,7 +1046,7 @@ flowchart LR
 <!-- ══════════ Footer ══════════ -->
   <footer class="border-t border-stone-200 pt-6 text-xs leading-5 text-slate-400 space-y-1">
     <p><strong class="text-slate-500">证据等级</strong>：确证 = 可复现的静态实锤；风险 = 静态反模式命中 / LLM 推断，未动态验证。 <strong class="text-slate-500">未覆盖族</strong>：D 依赖与环境、G 架构形状（无候选过线）。 <strong class="text-slate-500">销账</strong>：修复后重跑扫描，对应条目自动消失；git 历史 + diff 即审计轨迹。</p>
-    <p>本报告由 cognicode 生成 · 原型讨论稿（wayfinder #64 v3）· 高严重度 4 · 中严重度 12 · 低严重度 5 · 独立计数 15 项 + 1 项横向发现（新增 agent 的散布税）</p>
+    <p>本报告由 cognicode 生成 · 原型讨论稿（wayfinder #64 v3）· 高严重度 5 · 中严重度 12 · 低严重度 5 · 其中「新增 agent 改 13 个文件」为本报告新识别的债类型</p>
   </footer>
 
 </main>
