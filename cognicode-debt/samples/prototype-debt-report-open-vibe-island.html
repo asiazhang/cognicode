@@ -18,7 +18,35 @@
 </style>
 </head>
 <body class="bg-stone-50 text-slate-900 font-sans">
-<main class="max-w-5xl mx-auto px-6 py-12 space-y-14">
+
+  <!-- ══════════ 侧边导航 ══════════ -->
+  <nav id="toc" class="hidden xl:block fixed top-0 right-0 h-screen w-56 border-l border-stone-200 bg-white/80 backdrop-blur px-4 py-8 overflow-y-auto text-[12px] leading-5 z-40">
+    <div class="text-[10px] uppercase tracking-wider text-slate-400 mb-2">目录</div>
+    <a href="#matrix" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">优先级矩阵</a>
+    <a href="#top-recommendation" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">Top recommendation</a>
+    <div class="mt-3 mb-1 text-[10px] uppercase tracking-wider text-emerald-700 font-semibold pl-2">推荐先修 · 4</div>
+    <a href="#fix-1" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">支持矩阵三副本归一</a>
+    <a href="#fix-2" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">拆解 BridgeServer</a>
+    <a href="#fix-3" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">AppModel 派生抽离</a>
+    <a href="#fix-4" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">ProcessMonitoring 参数化</a>
+    <div class="mt-3 mb-1 text-[10px] uppercase tracking-wider text-amber-600 font-semibold pl-2">重点类型 · 7</div>
+    <a href="#dup-design" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">design 资产重复簇</a>
+    <a href="#dup-workflow" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">工作流重述分叉</a>
+    <a href="#mono-islandview" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">IslandPanelView 状态机</a>
+    <a href="#mono-hookinstall" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">HookInstall 三域拆出</a>
+    <a href="#flaky-sleep" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">蒙眼 sleep → 等条件</a>
+    <a href="#flaky-clock" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">墙钟 → 注入 clock</a>
+    <a href="#gap-core" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">Core 保护空洞 15%</a>
+    <a href="#gap-app" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">coordinator 空洞 24%</a>
+    <div class="mt-3 mb-1 text-[10px] uppercase tracking-wider text-slate-400 font-semibold pl-2">其余 · 5</div>
+    <a href="#docrot-agents" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">AGENTS.md 断链</a>
+    <a href="#docrot-claude" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">CLAUDE.md 断链</a>
+    <a href="#implicit-contract" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">隐式契约进签名</a>
+    <a href="#build-entry" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">AX 验证回路</a>
+    <a href="#oral-tradition" class="toc-link block py-0.5 pl-2 border-l-2 border-transparent text-slate-500 hover:text-slate-900 hover:border-stone-300 transition-colors">design 口头传统</a>
+  </nav>
+
+<main class="max-w-5xl mx-auto px-6 py-12 space-y-14 xl:mr-64">
 
   <!-- ══════════ Header ══════════ -->
   <header class="space-y-4">
@@ -161,12 +189,12 @@ flowchart TB
           <p><strong class="text-slate-900">为什么是债：</strong>agent/terminal 支持矩阵存在三份副本且已实际分叉——README 15 行、zh-CN 14 行、product.md 11 行；Warp 状态直接矛盾（README「Full」vs product.md「Planned」），Gemini hook 事件列表两份说法不一。两份代理文档还各执一词：CLAUDE.md 称「README.md — that's the single source of truth」，AGENTS.md 称「Keep product scope in docs/product.md」。新增 agent 是本项目高频事件（90 天 README 被改 34 次），agent 依读到的不同文档改不同文件，改 A 忘 B 已实际发生（CodeBuddy/Grok 缺于 product.md）。</p>
           <p><strong class="text-slate-900">怎么修：</strong>人裁唯一权威源（product.md 或 README 二选一），两份代理文档统一指向它；其余副本改为生成或链接；立即补齐已分叉条目（product.md 补 Cursor/Grok Build、修正 Warp 状态，zh-CN 补 Claude Code Desktop App）。fork 配置句式（12 处重复，未分叉）随矩阵收敛自动消解。</p>
         </div>
-        <div class="border-t border-stone-100 pt-3">
-          <div class="text-[10px] uppercase tracking-wider text-slate-400 mb-1.5">收益</div>
-          <ul class="grid md:grid-cols-3 gap-1.5 text-[13px] text-slate-700">
-            <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>改一处，三处同步</li>
-            <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>新增 agent 不再猜权威源</li>
-            <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>Warp 类状态矛盾归零</li>
+        <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3 mt-1">
+          <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
+          <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
+            <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>改一处，三处同步</li>
+            <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>新增 agent 不再猜权威源</li>
+            <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>Warp 类状态矛盾归零</li>
           </ul>
         </div>
       </div>
@@ -217,12 +245,12 @@ flowchart TB
           <p><strong class="text-slate-900">为什么是债：</strong>单 class 承载 socket 传输 + 命令分发 + 7 个 agent 的 hook 处理器家族（handle*Hook + ensure*SessionExists + 四件套 ×7）+ 9 个 <span class="mono text-xs">Pending*</span> 待决状态字典 + Claude transcript 游标 + 双状态快照。agent 改任一 agent 的 hook 行为需同时掌握共享 pending 状态语义、localState/stateSnapshot 覆写约定（79-89 行注释自认非显然）、envelope 发送路径——典型修改需全读 30K token，直逼 agent 有效上下文参考线；跨 agent 待决状态靠隐式约定维持，局部修改极易破坏其他 agent 的状态机。</p>
           <p><strong class="text-slate-900">怎么修：</strong>按 agent 拆 HookHandler 模块（Pending 状态聚合为显式类型），socket 传输与 hook 语义分层，分发器只留路由。修复成本高，但被踩频率同样高——每支持一个新 agent 都在加深它，越晚拆越贵。</p>
         </div>
-        <div class="border-t border-stone-100 pt-3">
-          <div class="text-[10px] uppercase tracking-wider text-slate-400 mb-1.5">收益</div>
-          <ul class="grid md:grid-cols-3 gap-1.5 text-[13px] text-slate-700">
-            <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>改一个 agent 只读一个模块</li>
-            <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>30K → 按需 ~5K token</li>
-            <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>Pending 状态显式、可单测</li>
+        <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3 mt-1">
+          <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
+          <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
+            <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>改一个 agent 只读一个模块</li>
+            <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>30K → 按需 ~5K token</li>
+            <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>Pending 状态显式、可单测</li>
           </ul>
         </div>
       </div>
@@ -270,12 +298,12 @@ flowchart TB
           <p><strong class="text-slate-900">为什么是债：</strong>@Observable 上帝对象：聚合 6 个 coordinator、约 40 个一行转发函数、state 的 didSet 三重隐式副作用（缓存失效 + bridge 快照推送 + 票据修剪）、外观持久化、排序派生。观察票据/缓存失效等不变量只存在于注释（52-77 行），会话相关修改需理解全链副作用才能安全动手。90 天被改 11 次——全清单被踩最频繁的文件。</p>
           <p><strong class="text-slate-900">怎么修：</strong>v6 派生（排序/分组/票据/闭岛标签）抽为独立 derivation 模块（纯函数化，可单测），转发层按域分文件。可渐进：先抽票据/缓存失效不变量为显式类型。</p>
         </div>
-        <div class="border-t border-stone-100 pt-3">
-          <div class="text-[10px] uppercase tracking-wider text-slate-400 mb-1.5">收益</div>
-          <ul class="grid md:grid-cols-3 gap-1.5 text-[13px] text-slate-700">
-            <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>副作用从注释进签名</li>
-            <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>删 ~40 个转发函数</li>
-            <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>派生逻辑可单测</li>
+        <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3 mt-1">
+          <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
+          <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
+            <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>副作用从注释进签名</li>
+            <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>删 ~40 个转发函数</li>
+            <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>派生逻辑可单测</li>
           </ul>
         </div>
       </div>
@@ -328,12 +356,12 @@ flowchart TB
           <p><strong class="text-slate-900">为什么是债：</strong>进程 liveness 跟踪 + 5 个 agent 的 uniqueTracked*Session 家族（各自进程匹配与合成会话逻辑）+ TTY 认领 + 跨工具清洗。与 BridgeServer 同型的 per-agent 复制家族 + 共享 reconcile 语义：新增/修改某 agent 的匹配规则需理解主循环与其他 agent 匹配块的共享不变量，家族式复制使 agent 的 diff 定位困难。</p>
           <p><strong class="text-slate-900">怎么修：</strong>per-agent 匹配抽统一协议/泛型骨架，agent 差异参数化。与先修 #2 同型，可共用拆分手法、一次评审。</p>
         </div>
-        <div class="border-t border-stone-100 pt-3">
-          <div class="text-[10px] uppercase tracking-wider text-slate-400 mb-1.5">收益</div>
-          <ul class="grid md:grid-cols-3 gap-1.5 text-[13px] text-slate-700">
-            <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>新增 agent 参数化接入</li>
-            <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>匹配规则单点修改</li>
-            <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>diff 定位不再迷路</li>
+        <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3 mt-1">
+          <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
+          <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
+            <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>新增 agent 参数化接入</li>
+            <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>匹配规则单点修改</li>
+            <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>diff 定位不再迷路</li>
           </ul>
         </div>
       </div>
@@ -345,7 +373,7 @@ flowchart TB
     <h2 class="serif text-2xl font-bold border-b border-stone-200 pb-2">重点类型 <span class="text-sm font-normal text-slate-500 mono">7 项 · 依据：研究证据强 ∩ AI 迭代高发</span></h2>
 
     <!-- design bundle dup -->
-    <article class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <article id="dup-design" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-amber-600 rounded px-2 py-0.5 font-semibold">择机</span>
         <h3 class="serif text-lg font-bold">design 资产跨 bundle 重复簇</h3>
@@ -379,15 +407,18 @@ flowchart TB
         <p><strong class="text-slate-900">为什么是债：</strong>同一设计知识（v6 锁定视觉 DNA）跨 bundle 双份，styles_v7.css 已静默分叉；v6-bundle 内 v3–v7 迭代版本并存且 README 无权威声明（是通用 handoff 模板）。缓解信号：v8-bundle/README 有部分权威声明但未覆盖 styles 分叉。agent 被要求改 v7 样式时无法判断改哪份；且生产脚本以 v6-bundle 的 logos_v7.jsx 为 app icon spec 来源——活引用，不是纯归档。</p>
         <p><strong class="text-slate-900">怎么修：</strong>抽 design/shared/ 存放锁定资产，两 bundle 改引用；v6-bundle/README 顶部补权威声明（superseded by v8）；删除逐字重复的 notch_v6.jsx；tmp/ 截图入 .gitignore。</p>
       </div>
-      <ul class="grid md:grid-cols-3 gap-1.5 text-[13px] text-slate-700 border-t border-stone-100 pt-3">
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>锁定资产单点维护</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>「改哪份」歧义归零</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>生产引用不再指向归档</li>
-      </ul>
+      <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3">
+        <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
+        <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>锁定资产单点维护</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>「改哪份」歧义归零</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>生产引用不再指向归档</li>
+        </ul>
+      </div>
     </article>
 
     <!-- workflow restatement -->
-    <article class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <article id="dup-workflow" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-amber-600 rounded px-2 py-0.5 font-semibold">择机</span>
         <h3 class="serif text-lg font-bold">工作流重述分叉：CLAUDE.md vs AGENTS.md</h3>
@@ -420,15 +451,18 @@ flowchart TB
         <p><strong class="text-slate-900">为什么是债：</strong>同一工作流在两份代理文档中不完全一致重述，至少三处实质分叉：worktree 创建方式（EnterWorktree+local main vs sibling 路径+origin/main——分支基点为行为类断言且未声明哪份优先）、PR draft 政策（AGENTS.md 整段 vs CLAUDE.md 未提）、两份均未声明权威层级。并行多 agent 场景下不同 agent 产出不一致的分支/worktree 布局，集成时冲突且无法归因到文档分叉。</p>
         <p><strong class="text-slate-900">怎么修：</strong>声明权威层级（如 CLAUDE.md 开头注明「完整权威工作协议见 AGENTS.md，冲突以它为准」，方向由人裁）；统一分支基点措辞；CLAUDE.md 的 Workflow 节改为摘要+指向。</p>
       </div>
-      <ul class="grid md:grid-cols-3 gap-1.5 text-[13px] text-slate-700 border-t border-stone-100 pt-3">
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>并行 agent 布局一致</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>分叉冲突可归因</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>文档一处修改一处生效</li>
-      </ul>
+      <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3">
+        <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
+        <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>并行 agent 布局一致</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>分叉冲突可归因</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>文档一处修改一处生效</li>
+        </ul>
+      </div>
     </article>
 
     <!-- IslandPanelView -->
-    <article class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <article id="mono-islandview" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-amber-600 rounded px-2 py-0.5 font-semibold">择机</span>
         <h3 class="serif text-lg font-bold">IslandPanelView：开合状态机与布局解耦</h3>
@@ -462,15 +496,18 @@ flowchart TB
         <p><strong class="text-slate-900">为什么是债：</strong>单 SwiftUI View 内嵌开合表面挂载状态机（四态联动 + mount 代数机制）与布局深度耦合。UI 微调局部性好，但改过渡/开合行为需重建 26K token 的状态机心智模型，回归面覆盖整个岛屿开合体验。注意：成立靠的是状态机耦合不是行数——同仓库 AppearanceSettingsPane（1539 行）纯布局局部性好，不报。</p>
         <p><strong class="text-slate-900">怎么修：</strong>挂载状态机抽为独立 @Observable 状态对象（可单测），View 只消费；opened/closed/transition 三段表面拆子文件。</p>
       </div>
-      <ul class="grid md:grid-cols-3 gap-1.5 text-[13px] text-slate-700 border-t border-stone-100 pt-3">
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>状态机离线可单测</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>改过渡不再全读 26K</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>回归面收窄到子文件</li>
-      </ul>
+      <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3">
+        <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
+        <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>状态机离线可单测</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>改过渡不再全读 26K</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>回归面收窄到子文件</li>
+        </ul>
+      </div>
     </article>
 
     <!-- HookInstallationCoordinator -->
-    <article class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <article id="mono-hookinstall" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-amber-600 rounded px-2 py-0.5 font-semibold">择机</span>
         <h3 class="serif text-lg font-bold">HookInstallationCoordinator：迁移与自修复域拆出</h3>
@@ -505,15 +542,18 @@ flowchart TB
         <p><strong class="text-slate-900">为什么是债：</strong>~12 个 agent 的 hook 安装/卸载/状态刷新 + intent store 迁移 + 健康检查自动修复 + hooks 二进制自更新 + Claude 配置目录管理。改某 agent 的安装逻辑需确认不破坏 intent store 迁移序与健康检查自动修复链（与安装状态共享字段），横切读面大。AppModel 里 40 个纯转发是它多域聚合的旁证。</p>
         <p><strong class="text-slate-900">怎么修：</strong>intent store 迁移与健康检查抽独立类型；per-agent 安装参数化收敛。</p>
       </div>
-      <ul class="grid md:grid-cols-3 gap-1.5 text-[13px] text-slate-700 border-t border-stone-100 pt-3">
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>改安装不碰迁移链</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>三域各自可单测</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>转发层随域收敛</li>
-      </ul>
+      <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3">
+        <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
+        <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>改安装不碰迁移链</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>三域各自可单测</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>转发层随域收敛</li>
+        </ul>
+      </div>
     </article>
 
     <!-- flaky sleep -->
-    <article class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <article id="flaky-sleep" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-amber-600 rounded px-2 py-0.5 font-semibold">择机</span>
         <h3 class="serif text-lg font-bold">蒙眼 sleep 改等条件：5 处时间性红绿</h3>
@@ -552,15 +592,18 @@ sequenceDiagram
         <p><strong class="text-slate-900">为什么是债：</strong>5 处蒙眼等待：append 后 <span class="mono text-xs">Task.sleep(200ms)</span> 盲等 watcher（pollInterval 0.05s）消费完再继续，不等条件只等时间。CI 慢时 watcher 未消费即被 stop，<span class="mono text-xs">events.contains</span> 断言随机红——agent 会把时间性红绿误判为自己改坏了 rollout 追踪逻辑，失败归因被污染。对照：同文件条件轮询（:460）、deadline 轮询（:602）判为合理等待，不计入。</p>
         <p><strong class="text-slate-900">怎么修：</strong>改为等条件（轮询 recorder.snapshot() 至断言条件满足），复用现成 <span class="mono text-xs">CodexAppServerLifecycleTests.swift:53</span> 的 waitUntil(deadline:condition:) 模式或暴露事件回调计数。</p>
       </div>
-      <ul class="grid md:grid-cols-3 gap-1.5 text-[13px] text-slate-700 border-t border-stone-100 pt-3">
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>时间性红绿归零</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>失败归因回到改动本身</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>复用现成 waitUntil 模式</li>
-      </ul>
+      <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3">
+        <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
+        <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>时间性红绿归零</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>失败归因回到改动本身</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>复用现成 waitUntil 模式</li>
+        </ul>
+      </div>
     </article>
 
     <!-- flaky wall clock -->
-    <article class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <article id="flaky-clock" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-amber-600 rounded px-2 py-0.5 font-semibold">择机</span>
         <h3 class="serif text-lg font-bold">墙钟断言注入 clock：已被 CI 真实 flaky 一次</h3>
@@ -597,15 +640,18 @@ sequenceDiagram
         <p><strong class="text-slate-900">为什么是债：</strong><span class="mono text-xs">Date()</span> 起止断言真实墙钟调度延迟，把 CI 机器负载耦合进测试语义。git 旁证：提交 b3738b6（PR #702）刚因 CI 争抢把 elapsed 推到 2.0–2.4s（bound 2.0s）真实 flaky 过一次，放宽到 5s 治标未治本——墙钟依赖仍在，下次调度争抢还会红，agent 会误以为超时机制回归。</p>
         <p><strong class="text-slate-900">怎么修：</strong>二分——保留宽松 smoke（elapsed &lt; 10s 防挂死）+ 精确 fail-fast 断言改为注入 clock 的单元测试（ContinuousClock 注入）。</p>
       </div>
-      <ul class="grid md:grid-cols-3 gap-1.5 text-[13px] text-slate-700 border-t border-stone-100 pt-3">
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>断言与机器负载解耦</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>超时语义可精确验证</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>不再周期性假红</li>
-      </ul>
+      <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3">
+        <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
+        <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>断言与机器负载解耦</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>超时语义可精确验证</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>不再周期性假红</li>
+        </ul>
+      </div>
     </article>
 
     <!-- test-gap Core -->
-    <article class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <article id="gap-core" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-amber-600 rounded px-2 py-0.5 font-semibold">择机</span>
         <h3 class="serif text-lg font-bold">OpenIslandCore 保护空洞：~15% 声明零触达</h3>
@@ -645,15 +691,18 @@ sequenceDiagram
         <p><strong class="text-slate-900">为什么是债：</strong>约 110/745 声明（~15%）零测试触达，且是结构性保护空洞而非规模效应：WatchHTTPEndpoint 500 行（配对码 120s TTL 过期、token 撤销、SSE 连接管理）零触达；三个安装管理器<strong>直接写用户家目录配置文件</strong>（settings.json 合并/备份/卸载恢复）却零保护；TimedCache 是 @unchecked Sendable 手写锁并发原语。agent 重构这些区域无法自证没炸。</p>
         <p><strong class="text-slate-900">怎么修：</strong>WatchHTTPEndpoint 配对码过期/重生补单测（Date 可注入）；安装管理器复用 Claude 侧 temp 目录模式；CursorSessionRegistry 抄 ClaudeSessionRegistryTests 往返；TimedCache 补 TTL 与并发 miss。</p>
       </div>
-      <ul class="grid md:grid-cols-3 gap-1.5 text-[13px] text-slate-700 border-t border-stone-100 pt-3">
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>家目录写入有回归网</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>重构可自证没炸</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>同构模块保护对齐</li>
-      </ul>
+      <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3">
+        <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
+        <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>家目录写入有回归网</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>重构可自证没炸</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>同构模块保护对齐</li>
+        </ul>
+      </div>
     </article>
 
     <!-- test-gap App -->
-    <article class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <article id="gap-app" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-amber-600 rounded px-2 py-0.5 font-semibold">择机</span>
         <h3 class="serif text-lg font-bold">coordinator 层保护空洞：~24% 声明零触达</h3>
@@ -687,11 +736,14 @@ flowchart TB
         <p><strong class="text-slate-900">为什么是债：</strong>剔除合理无单测的纯 UI 文件后核心逻辑约 180/754 声明（~24%）零触达：TerminalJumpTargetResolver 848 行 AppleScript 快照解析、TerminalTextSender 的 tmux send-keys 注入是 agent 常改的终端集成热区，改一行无红绿反馈；CodexAppServerCoordinator 的通知→session 映射改错会<strong>静默丢会话</strong>。口径已知假阳性：AgentSession+Presentation 行为已被间接覆盖。</p>
         <p><strong class="text-slate-900">怎么修：</strong>快照解析是纯数据变换，拆 parser 函数即可低成本补测；CodexAppServerCoordinator 参考 CodexAppServerLifecycleTests 的 Pipe 桩模式注入；TerminalTextSender.canReply 纯函数直接可测。</p>
       </div>
-      <ul class="grid md:grid-cols-3 gap-1.5 text-[13px] text-slate-700 border-t border-stone-100 pt-3">
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>终端热区改行有红绿</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>静默丢会话可回归捕获</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>纯函数拆分即测试</li>
-      </ul>
+      <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3">
+        <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
+        <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>终端热区改行有红绿</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>静默丢会话可回归捕获</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>纯函数拆分即测试</li>
+        </ul>
+      </div>
     </article>
   </section>
 
@@ -700,7 +752,7 @@ flowchart TB
     <h2 class="serif text-2xl font-bold border-b border-stone-200 pb-2">其余类型 <span class="text-sm font-normal text-slate-500 mono">4 项 · 多为沉睡债（热点 0），修不修看团队节奏</span></h2>
 
     <!-- doc-rot AGENTS.md -->
-    <article class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <article id="docrot-agents" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-slate-500 rounded px-2 py-0.5 font-semibold">沉睡</span>
         <h3 class="serif text-lg font-bold">AGENTS.md worktree 规则：硬编码维护者绝对路径</h3>
@@ -732,15 +784,18 @@ flowchart LR
         <p><strong class="text-slate-900">为什么是债：</strong>AGENTS.md 作为 agent 第一信源，其 worktree 工作流规则硬编码维护者本机绝对路径（<span class="mono text-xs">/Users/wangruobing/Personal/open-island</span>）。61 行链接在任何其他 clone 点开即断；46/51 行使 sibling worktree 命名规则在所有非维护者环境不可执行。agent 读到规则却无法照做——文档主动误导，失败信号「链接 404」与代码错误同形，归因被污染。注：虽是沉睡债（90 天 0 改动），修复成本极低，随手可修。</p>
         <p><strong class="text-slate-900">怎么修：</strong>61 行改仓库相对链接；46/51 行改基于 clone 位置的相对推导（如 <span class="mono text-xs">&lt;repo-parent&gt;/open-island-&lt;topic&gt;</span>）；同步检查 docs/worktree-workflow.md 内是否同样硬编码。</p>
       </div>
-      <ul class="grid md:grid-cols-3 gap-1.5 text-[13px] text-slate-700 border-t border-stone-100 pt-3">
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>规则在他机可执行</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>断链归零</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>三行改动，五分钟</li>
-      </ul>
+      <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3">
+        <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
+        <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>规则在他机可执行</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>断链归零</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>三行改动，五分钟</li>
+        </ul>
+      </div>
     </article>
 
     <!-- doc-rot CLAUDE.md -->
-    <article class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <article id="docrot-claude" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-slate-500 rounded px-2 py-0.5 font-semibold">沉睡</span>
         <h3 class="serif text-lg font-bold">CLAUDE.md key-files：声明的入口文件不存在</h3>
@@ -772,15 +827,18 @@ flowchart LR
         <p><strong class="text-slate-900">为什么是债：</strong>CLAUDE.md Key files 节断言 <span class="mono text-xs">Sources/OpenIslandHooks/main.swift — hook CLI entry</span>，该文件不存在；实际入口是 <span class="mono text-xs">OpenIslandHooksCLI.swift</span>（目录内唯一文件）。agent 按文档直取会扑空，批量引用扫描时得出「入口缺失」错误结论。误导方向轴判轻：错误在同目录且唯一，一次 ls 即自愈。</p>
         <p><strong class="text-slate-900">怎么修：</strong>改一行：<span class="mono text-xs">Sources/OpenIslandHooks/OpenIslandHooksCLI.swift — hook CLI entry</span>。</p>
       </div>
-      <ul class="grid md:grid-cols-3 gap-1.5 text-[13px] text-slate-700 border-t border-stone-100 pt-3">
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>入口断言恢复真实</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>批量扫描不再误报</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>一行改动</li>
-      </ul>
+      <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3">
+        <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
+        <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>入口断言恢复真实</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>批量扫描不再误报</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>一行改动</li>
+        </ul>
+      </div>
     </article>
 
     <!-- implicit-contract -->
-    <article class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <article id="implicit-contract" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-slate-500 rounded px-2 py-0.5 font-semibold">沉睡</span>
         <h3 class="serif text-lg font-bold">migrateIntentStoreIfNeeded：顺序不变量只在注释里</h3>
@@ -817,15 +875,18 @@ sequenceDiagram
         <p><strong class="text-slate-900">为什么是债：</strong>调用顺序不变量只存在于 doc 注释：「Must be called only after refreshAllHookStatusAndWait() has returned, otherwise every agent will be recorded as .untouched and legacy users will have their installed hooks <strong>silently forgotten</strong>」。签名无任何强制（非 async、无 precondition、无状态门）。agent 或新调用方在非 async 上下文直接调用可编译通过，静默产出错误 intent 记录——违反后果烈度 = 静默错结果，无崩溃无报错。研究票校准：间接证据为主、agent 自行验证部分兜底，严重度建议中偏高（预排高）。</p>
         <p><strong class="text-slate-900">怎么修：</strong>把前置条件变成签名——方法改为接收刷新后的状态快照参数，或内部自行 await 刷新 + precondition 门。</p>
       </div>
-      <ul class="grid md:grid-cols-3 gap-1.5 text-[13px] text-slate-700 border-t border-stone-100 pt-3">
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>顺序错误编译期暴露</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>静默遗忘变显式失败</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>不变量从注释进类型</li>
-      </ul>
+      <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3">
+        <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
+        <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>顺序错误编译期暴露</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>静默遗忘变显式失败</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>不变量从注释进类型</li>
+        </ul>
+      </div>
     </article>
 
     <!-- build-entry -->
-    <article class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <article id="build-entry" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-slate-500 rounded px-2 py-0.5 font-semibold">沉睡</span>
         <h3 class="serif text-lg font-bold">AX 验证回路：一次性人工前置不可自举</h3>
@@ -858,15 +919,18 @@ flowchart TB
         <p><strong class="text-slate-900">为什么是债：</strong>AX 功能（precision jump/keystroke injection）的验证回路依赖一次性人工前置——setup-dev-signing.sh 签名 + 手动 TCC 授权，且 canonical 运行时（swift run）与 dev bundle 的 TCC 键不同。agent 无法自举该前置：误用裸 swift run 或 <span class="mono text-xs">open -na</span> 得到 stale bundle / TCC 拒绝的假阴性，与「功能坏了」不可区分。入口声明本身健康（文档链完整、脚本有自检提示），故判低。</p>
         <p><strong class="text-slate-900">怎么修：</strong>launch-dev-app.sh 的 ad-hoc 回退分支加机器可检测标记（artifact/exit code 语义）；CLAUDE.md canonical runtime 处一句话注明 AX 验证必须走 bundle 路径。</p>
       </div>
-      <ul class="grid md:grid-cols-3 gap-1.5 text-[13px] text-slate-700 border-t border-stone-100 pt-3">
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>假阴性可归因为环境</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>验证回路 agent 可走</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>脚本语义自描述</li>
-      </ul>
+      <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3">
+        <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
+        <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>假阴性可归因为环境</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>验证回路 agent 可走</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>脚本语义自描述</li>
+        </ul>
+      </div>
     </article>
 
     <!-- oral-tradition -->
-    <article class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
+    <article id="oral-tradition" class="rounded-xl border border-stone-200 bg-white p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <span class="mono text-[11px] text-white bg-slate-500 rounded px-2 py-0.5 font-semibold">沉睡</span>
         <h3 class="serif text-lg font-bold">design/ 目录：权威信息只活在维护者脑子里</h3>
@@ -898,11 +962,14 @@ flowchart LR
         <p><strong class="text-slate-900">为什么是债：</strong>v6-bundle/README.md 是 Claude Design 通用 handoff 模板，零版本权威信息——哪些组件是锁定资产、v3–v7 哪个是当前真相、tmp/ 截图是否可删，这些「应知」只活在维护者脑子里。对照 v8-bundle/README.md:8-17 有明确 source-of-truth 声明（知识已外化的正例）。agent 在 design/ 下工作时须靠猜或全读。</p>
         <p><strong class="text-slate-900">怎么修：</strong>随 duplicate-code@design 簇一并处理——v6-bundle/README.md 顶部补权威声明后本条自动消解，不单独立案。</p>
       </div>
-      <ul class="grid md:grid-cols-3 gap-1.5 text-[13px] text-slate-700 border-t border-stone-100 pt-3">
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>「应知」进文档</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>随簇修复零额外成本</li>
-        <li class="flex gap-1.5"><span class="text-emerald-600">✓</span>guess → read</li>
-      </ul>
+      <div class="rounded-lg bg-emerald-50 border-l-4 border-emerald-500 px-4 py-3">
+        <div class="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold mb-1.5">收益 · 修完之后</div>
+        <ul class="grid md:grid-cols-3 gap-x-4 gap-y-1 text-[13px] font-medium text-emerald-900">
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>「应知」进文档</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>随簇修复零额外成本</li>
+        <li class="flex gap-1.5 items-baseline"><span class="text-emerald-600 font-bold">✓</span>guess → read</li>
+        </ul>
+      </div>
     </article>
   </section>
 
@@ -913,5 +980,24 @@ flowchart LR
   </footer>
 
 </main>
+
+<script>
+  // scrollspy：当前视口内的章节高亮
+  const links = [...document.querySelectorAll('#toc .toc-link')];
+  const map = links.map(a => ({ a, el: document.querySelector(a.getAttribute('href')) }));
+  const setActive = id => {
+    links.forEach(a => {
+      const on = a.getAttribute('href') === '#' + id;
+      a.classList.toggle('text-emerald-700', on);
+      a.classList.toggle('border-emerald-500', on);
+      a.classList.toggle('font-medium', on);
+      if (on) a.scrollIntoView({ block: 'nearest' });
+    });
+  };
+  const observer = new IntersectionObserver(entries => {
+    for (const e of entries) if (e.isIntersecting) setActive(e.target.id);
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  map.forEach(({ el }) => el && observer.observe(el));
+</script>
 </body>
 </html>
