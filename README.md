@@ -55,49 +55,35 @@ CogniCode 正在从「AI 原生程度打分工具」转型为这个空档的填�
 
 ## 交付形态（转型目标）
 
-- **载体 = skill 集合**：`SKILL.md` 管 LLM 推断档与报告组织，内嵌确定性分析脚本管可复现提取；skill 仓库本身是分发单元，CLI 降为脚本副产品。
-- **报告 = 仓库内 `DEBT.md`**：按严重度排序的债项清单，可 diff、可追债的增减，兼作二次运行对比基准。
+- **载体 = skill 集合**：`SKILL.md` 管编排协议（脚本提取 → 分族子代理推断 → 单写手 JSON 清单），内嵌确定性脚本管可复现提取；skill 目录本身是分发单元。
+- **报告 = JSON 债项清单 + 确定性 HTML 渲染**（[地图 #63](https://github.com/asiazhang/cognicode/issues/67) 修订）：LLM 单写手产出结构化 JSON 清单（ID/排序等确定性字段稳定，可 diff、可销账），脚本渲染器零 LLM 出 HTML 报告，落盘临时目录即开即看。
 - **首发受众**：个人开发者为主（agent 迷路、跨文件失手），团队负责人为辅（review 负担、质量滑坡）——两端痛点不同但指向同一批债项。
 - **动态测量**（跑真实 agent 验证债项的实际伤害）为二期实证校验，首发不含。
 
 ## 当前状态
 
-重定位决策已锁定（[ADR-0006](docs/adr/0006-relocate-to-ai-debt-identification.md)），wayfinder 决策链全部闭合（[地图 #39](https://github.com/asiazhang/cognicode/issues/39) 已收官）：
+重定位决策已锁定（[ADR-0006](docs/adr/0006-relocate-to-ai-debt-identification.md)），前置 wayfinder 地图（[#39](https://github.com/asiazhang/cognicode/issues/39)）已收官；呈现形态地图（[#63](https://github.com/asiazhang/cognicode/issues/63)）裁定了终产物形态。
 
-- **已完成**：债分类学（20 类型）、痛点与空档调研、七族判据文件与 17 份逐规则详解、skill 结构设计、仓库清仓、重定位决策文档、[DEBT.md 样例实战验证](cognicode-debt/samples/DEBT.sample-open-vibe-island.md)（15 债项，展示形态成立）
-- **进行中**：`cognicode-debt` skill 本体——SKILL.md 编排协议与确定性提取脚本（样例实战回修出三个执行协议缺口：子代理 JSON 校验、ID 锚点三形态、跨族去重规则）
-- **二期**：动态测量实证校验（变异性测试 oracle、有效上下文校准）
+- **已完成**：债分类学（20 类型）、痛点与空档调研、七族判据文件与 17 份逐规则详解、skill 结构设计、仓库清仓、[DEBT.md 样例实战验证](cognicode-debt/samples/DEBT.sample-open-vibe-island.md)、skill 本体实现——`cognicode-debt/` 自包含（SKILL.md 编排协议 + 确定性提取脚本 + 渲染器），[tracer bullet #61](https://github.com/asiazhang/cognicode/issues/61) 已在 open-vibe-island 全管线跑通（含幂等验收）
+- **已退役**：旧评分形态 CLI 与残余代码（src/ 删除，#62）——仓库收敛为 `cognicode-debt/`（可分发的 skill 目录）+ `docs/`（决策与研究）+ `CONTEXT.md`（术语表）
+- **二期**：动态测量实证校准（变异性测试 oracle、有效上下文校准）；类型级降噪与销账对比视图（[地图 #63](https://github.com/asiazhang/cognicode/issues/63) 雾区）
 
-现存 CLI 为旧形态遗留的静态提取壳（`cognicode scan <repo>`，tree-sitter 符号提取 + 静态信号），按 ADR-0006 降为脚本副产品，终将随 skill 化退役：
-
-```bash
-git clone https://github.com/asiazhang/cognicode.git
-cd cognicode
-uv sync --extra dev
-cognicode scan <repo>          # 静态信号提取（复用线，遗留）
-```
 ## 项目结构
 
 ```
-src/cognicode/
-├── symbols.py          # tree-sitter 符号提取（复用线）
-├── static_signals.py   # 静态信号提取（复用线）
-├── module_depth.py     # 模块深度判定（LLM 归因信号，复用线）
-├── probe.py            # 环境探测命令定位（复用线）
-├── attribution.py      # 归因管线（复用线）
-├── llm.py              # LLM 调用封装
-├── report.py           # 报告组织
-├── schema.py           # 版本与结构
-└── cli.py              # 静态提取壳（待 #42 定夺）
-tests/                  # pytest 测试套件
-docs/                   # ADR / 调研 / 域文档
-cognicode-debt/
-├── SKILL.md            # （待建）skill 编排协议
+cognicode-debt/           # 可分发的 skill 目录（自包含，无 src/ 依赖）
+├── SKILL.md            # skill 编排协议（三段管线 + 三回修点）
 ├── criteria/           # 判据：分族子代理作业指令
 │   ├── A-structural.md … G-architecture-shape.md   # 七族判据（F 并入 E）
 │   └── rules/          # 17 类型逐规则详解（人类向，含正反例，供讨论）
-└── samples/            # DEBT.md 样例（skill 形态的验收基准）
+├── scripts/            # 确定性提取脚本（scan / render）+ 随行测试
+└── samples/            # DEBT 样例（open-vibe-island，验收基准）
+docs/                   # ADR / 调研 / 域文档
+CONTEXT.md              # 领域词汇表（术语的唯一权威定义）
 ```
+
+旧评分形态的 `src/cognicode/`（CLI 壳、六维聚合报告、归因管线等）已按 [ADR-0006](docs/adr/0006-relocate-to-ai-debt-identification.md) 退役：可复用资产由 `cognicode-debt/scripts/` 收编（含 116 项随行测试），评分形态残余删除，pyproject 不再构建任何 Python 包（仅为 uv dev 环境服务）。
+
 
 ## 文档
 

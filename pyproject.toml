@@ -1,7 +1,7 @@
 [project]
 name = "cognicode"
 version = "0.1.0"
-description = "AI-native code readiness assessment and scoring tool."
+description = "AI 技术债识别工具（cognicode-debt skill 的宿主仓库；pyproject 仅承载 dev 环境）"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -12,15 +12,12 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
 
-[project.scripts]
-cognicode = "cognicode.cli:main"
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/cognicode"]
+# CLI 已退役（#62）：src/ 评分形态残余删除，仓库收敛为
+# cognicode-debt/（可分发的 skill 目录，自包含）+ docs/ + CONTEXT.md。
+# 本项目不再构建/安装任何 Python 包——pyproject 只为 uv dev 环境
+#（pytest 与 tree-sitter）服务。
+[tool.uv]
+package = false
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "cognicode-debt/scripts/tests"]
+testpaths = ["cognicode-debt/scripts/tests"]
