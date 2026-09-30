@@ -34,7 +34,9 @@ from pathlib import Path
 # 于 #61 落地为渲染器常量——「新增 agent 高频迭代踩到的类型」优先呈现）。
 # 强证据带（#65）：doc-rot、agent-doc-missing、build-entry-unclear、
 # monolith-file、test-gap、implicit-contract、naming-debt；其中与
-# 「AI 快速迭代累积债」场景直接相关的前六类置顶。
+# 「AI 快速迭代累积债」场景直接相关的前六类置顶（naming-debt 留在
+# 强证据带但不置顶：类型基线低——误导型实例已可在带内分层上进高带，
+# 由 debt.json 的 severity_band 承载，渲染器无需特判）。
 SCENARIO_FOCUS_SLUGS = frozenset({
     "doc-rot", "agent-doc-missing", "build-entry-unclear",
     "monolith-file", "test-gap", "implicit-contract",
